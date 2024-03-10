@@ -11,6 +11,7 @@ import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
 import net.minecraftforge.network.PacketDistributor;
@@ -27,6 +28,7 @@ public class ServerEvent {
     public static class FORGE {
         @SubscribeEvent
         public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
+            if(event.side != LogicalSide.SERVER) return;
             if (event.phase == TickEvent.Phase.START) {
                 String uuid = event.player.getUUID().toString();
                 if (keepUntil.containsKey(uuid)) {

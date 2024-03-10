@@ -48,7 +48,7 @@ public class DamageRender implements IGuiOverlay {
             int y = valTransform(Config.comboY, screenHeight);
             x = (int) (x / scale);
             y = (int) (y / scale);
-            GuiComponent.drawString(poseStack, gui.getFont(), i18n("combo.content", Data.combo), x, y, 0xFFFFFF);
+            GuiComponent.drawString(poseStack, gui.getFont(), i18n("combo.content", String.valueOf(Data.combo)), x, y, 0xFFFFFF);
             poseStack.popPose();
         }//COMBO Render
         {//List Render
@@ -66,7 +66,7 @@ public class DamageRender implements IGuiOverlay {
                 Data.latest.remove(0);
             }
             for (Pair<Float, Long> pair : Data.latest) {
-                GuiComponent.drawString(poseStack, gui.getFont(), i18n("damage_list.content", pair.getLeft()), x, y, 0xFFFFFF);
+                GuiComponent.drawString(poseStack, gui.getFont(), i18n("damage_list.content", String.format("%.1f",pair.getLeft())), x, y, 0xFFFFFF);
                 y += lh;
             }
 
@@ -107,13 +107,12 @@ public class DamageRender implements IGuiOverlay {
             }
             GuiComponent.drawString(poseStack,
                     gui.getFont(),
-                    i18n("number.content", Data.amount),
+                    i18n("number.content", String.format("%.1f",Data.amount)),
                     x,
                     y,
                     Data.confirm ? 0xf9a825 : 0xFFFFFF);
             poseStack.popPose();
         }//Number Render
-
     }
 
     private String i18n(String s, Object... args) {
