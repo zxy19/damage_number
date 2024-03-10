@@ -32,5 +32,4 @@ public class DamagePackage {
         toSend.putFloat("instant", instant);
         buffer.writeNbt(toSend);
     }
-    
 }

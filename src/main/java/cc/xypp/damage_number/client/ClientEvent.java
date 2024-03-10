@@ -4,7 +4,8 @@ import cc.xypp.damage_number.DamageNumber;
 import cc.xypp.damage_number.network.DamagePackage;
 import cc.xypp.damage_number.network.Network;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.gui.OverlayRegistry;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
@@ -35,17 +36,9 @@ public class ClientEvent {
                         }
                         context.get().setPacketHandled(true);
                     });
-        }
-
-        @SubscribeEvent
-        public static void ReloadConfigEvent(ModConfigEvent.Reloading event) {
-
-        }
-        @SubscribeEvent
-        public static void RegisterGuiOverlaysEvent(RegisterGuiOverlaysEvent event) {
             DamageRender damageRender = new DamageRender();
-            event.registerAboveAll("damage_number", damageRender);
+            OverlayRegistry.registerOverlayTop("DamageNumber", damageRender);
+            OverlayRegistry.enableOverlay(damageRender,true);
         }
-
     }
 }

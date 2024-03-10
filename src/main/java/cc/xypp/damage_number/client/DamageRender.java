@@ -6,14 +6,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
+import net.minecraftforge.client.gui.ForgeIngameGui;
+import net.minecraftforge.client.gui.IIngameOverlay;
 import cc.xypp.damage_number.Config;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Date;
 
-public class DamageRender implements IGuiOverlay {
+public class DamageRender implements IIngameOverlay {
     private long shakeDiff = 0;
     private long confirmTime = 0;
 
@@ -26,7 +26,7 @@ public class DamageRender implements IGuiOverlay {
     }
 
     @Override
-    public void render(ForgeGui gui, PoseStack poseStack, float partialTick, int screenWidth, int screenHeight) {
+    public void render(ForgeIngameGui gui, PoseStack poseStack, float partialTick, int screenWidth, int screenHeight) {
         if (!Config.showDamage) return;
         if (!Data.show) return;
         {//TITLE Render
@@ -48,7 +48,7 @@ public class DamageRender implements IGuiOverlay {
             int y = valTransform(Config.comboY, screenHeight);
             x = (int) (x / scale);
             y = (int) (y / scale);
-            GuiComponent.drawString(poseStack, gui.getFont(), i18n("combo.content", Data.combo), x, y, 0xFFFFFF);
+            GuiComponent.drawString(poseStack, gui.getFont(), i18n("combo.content",  String.valueOf(Data.combo)), x, y, 0xFFFFFF);
             poseStack.popPose();
         }//COMBO Render
         {//List Render
@@ -66,7 +66,7 @@ public class DamageRender implements IGuiOverlay {
                 Data.latest.remove(0);
             }
             for (Pair<Float, Long> pair : Data.latest) {
-                GuiComponent.drawString(poseStack, gui.getFont(), i18n("damage_list.content", pair.getLeft()), x, y, 0xFFFFFF);
+                GuiComponent.drawString(poseStack, gui.getFont(), i18n("damage_list.content",String.format("%.1f",pair.getLeft())), x, y, 0xFFFFFF);
                 y += lh;
             }
 
@@ -107,7 +107,7 @@ public class DamageRender implements IGuiOverlay {
             }
             GuiComponent.drawString(poseStack,
                     gui.getFont(),
-                    i18n("number.content", Data.amount),
+                    i18n("number.content",String.format("%.1f",Data.amount)),
                     x,
                     y,
                     Data.confirm ? 0xf9a825 : 0xFFFFFF);
@@ -119,4 +119,6 @@ public class DamageRender implements IGuiOverlay {
     private String i18n(String s, Object... args) {
         return I18n.get(String.valueOf(new ResourceLocation(DamageNumber.MODID, s)), args);
     }
+
+
 }

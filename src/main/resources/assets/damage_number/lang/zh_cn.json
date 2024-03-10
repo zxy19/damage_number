@@ -1,6 +1,6 @@
 {
   "damage_number:title.content": "Damage",
-  "damage_number:combo.content": "%dX Combo",
-  "damage_number:damage_list.content": " +%.1f",
-  "damage_number:number.content": "%.1f"
+  "damage_number:combo.content": "%sX Combo",
+  "damage_number:damage_list.content": " +%s",
+  "damage_number:number.content": "%s"
 }

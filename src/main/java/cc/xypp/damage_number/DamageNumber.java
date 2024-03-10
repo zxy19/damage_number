@@ -4,7 +4,6 @@ import cc.xypp.damage_number.client.ClientEvent;
 import cc.xypp.damage_number.network.DamagePackage;
 import cc.xypp.damage_number.server.ServerEvent;
 import com.mojang.logging.LogUtils;
-import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
