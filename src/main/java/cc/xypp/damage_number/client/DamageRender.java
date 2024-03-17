@@ -1,6 +1,7 @@
 package cc.xypp.damage_number.client;
 
 import cc.xypp.damage_number.DamageNumber;
+import cc.xypp.damage_number.data.DamageListItem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
@@ -9,6 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 import net.minecraftforge.client.gui.IIngameOverlay;
 import cc.xypp.damage_number.Config;
+import net.minecraftforge.fml.ModList;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Date;
@@ -65,8 +67,14 @@ public class DamageRender implements IIngameOverlay {
             while (Data.latest.size()>0 && Data.latest.get(0).getRight() < currentTime - 2000) {
                 Data.latest.remove(0);
             }
-            for (Pair<Float, Long> pair : Data.latest) {
-                GuiComponent.drawString(poseStack, gui.getFont(), i18n("damage_list.content",String.format("%.1f",pair.getLeft())), x, y, 0xFFFFFF);
+            for (Pair<DamageListItem, Long> pair : Data.latest) {
+                if(pair.getLeft().shield!=-1){
+                    cc.xypp.battery_shield.data.DamageNumberType damageNumberType = cc.xypp.battery_shield.data.DamageNumberType.values()[pair.getLeft().shield];
+                    GuiComponent.drawString(poseStack, gui.getFont(), i18n("damage_list.content",pair.getLeft().amount), x, y, cc.xypp.battery_shield.utils.ShieldUtil.getColor(damageNumberType));
+                    cc.xypp.battery_shield.utils.ShieldUtil.getIconByType(cc.xypp.battery_shield.data.DamageNumberType.values()[pair.getLeft().shield]).blit(poseStack,0,0);
+                }else{
+                    GuiComponent.drawString(poseStack, gui.getFont(), i18n("damage_list.content",String.format("%.1f",pair.getLeft().amount)), x, y, 0xffffffff);
+                }
                 y += lh;
             }
 

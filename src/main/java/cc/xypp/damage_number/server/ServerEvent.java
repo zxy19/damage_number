@@ -12,6 +12,7 @@ import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
 import net.minecraftforge.network.PacketDistributor;
@@ -37,7 +38,8 @@ public class ServerEvent {
                                 new DamagePackage("total",
                                         userDamage.get(uuid),
                                         damageCount.get(uuid),
-                                        0.0f));
+                                        0.0f,
+                                        -1));
                         keepUntil.remove(uuid);
                         damageCount.remove(uuid);
                         userDamage.remove(uuid);
@@ -54,11 +56,16 @@ public class ServerEvent {
                 damageCount.put(uid, damageCount.getOrDefault(uid, 0) + 1);
                 userDamage.put(uid, event.getAmount() + userDamage.getOrDefault(uid, 0.0f));
                 keepUntil.put(uid, new Date().getTime() + 3000);
+                int shield = -1;
+                if(ModList.get().isLoaded("battery_shield")){
+                    cc.xypp.battery_shield.api.IDamageSourceA sourceA = (cc.xypp.battery_shield.api.IDamageSourceA)event.getSource();
+                    shield= sourceA.getShieldDamageType().ordinal();
+                }
                 Network.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) entity),
                         new DamagePackage("emit",
                                 userDamage.get(uid),
                                 damageCount.get(uid),
-                                event.getAmount()));
+                                event.getAmount(),shield));
             }
         }
     }

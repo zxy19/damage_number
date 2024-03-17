@@ -8,11 +8,13 @@ public class DamagePackage {
     public float amount=0.0f;
     public int combo=0;
     public float instant=0.0f;
-    public DamagePackage(String type, float amount, int combo,float instant) {
+    public int shield=-1;
+    public DamagePackage(String type, float amount, int combo,float instant,int shield) {
         this.type = type;
         this.amount = amount;
         this.combo = combo;
         this.instant =  instant;
+        this.shield = shield;
     }
     public DamagePackage(FriendlyByteBuf buffer) {
         CompoundTag tag = buffer.readNbt();
@@ -21,6 +23,7 @@ public class DamagePackage {
             amount = tag.getFloat("amount");
             combo = tag.getInt("combo");
             instant = tag.getFloat("instant");
+            shield = tag.getInt("shield");
         }
     }
 
@@ -30,6 +33,7 @@ public class DamagePackage {
         toSend.putString("type", type);
         toSend.putInt("combo", combo);
         toSend.putFloat("instant", instant);
+        toSend.putInt("shield", shield);
         buffer.writeNbt(toSend);
     }
 }

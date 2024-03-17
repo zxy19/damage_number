@@ -1,6 +1,7 @@
 package cc.xypp.damage_number.client;
 
 
+import cc.xypp.damage_number.data.DamageListItem;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
@@ -13,6 +14,6 @@ public class Data {
     public static boolean show = false;
     public static int shakes = 3;
     public static boolean confirm = true;
-    public static List<Pair<Float,Long>> latest = new ArrayList<>();
+    public static List<Pair<DamageListItem,Long>> latest = new ArrayList<>();
     public static int combo = 0;
 }

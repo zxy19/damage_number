@@ -1,6 +1,7 @@
 package cc.xypp.damage_number.client;
 
 import cc.xypp.damage_number.DamageNumber;
+import cc.xypp.damage_number.data.DamageListItem;
 import cc.xypp.damage_number.network.DamagePackage;
 import cc.xypp.damage_number.network.Network;
 import net.minecraftforge.api.distmarker.Dist;
@@ -26,7 +27,8 @@ public class ClientEvent {
                             Data.amount = msg.amount;
                             Data.shakes = 4;
                             Data.combo = msg.combo;
-                            Data.latest.add(new MutablePair<>(msg.instant, new Date().getTime()));
+                            DamageListItem listItem = new DamageListItem(msg.instant, msg.shield);
+                            Data.latest.add(new MutablePair<>(listItem, new Date().getTime()));
                             Data.confirm = false;
                             Data.show = true;
                         } else if (Objects.equals(msg.type, "total")) {
