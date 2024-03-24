@@ -4,18 +4,18 @@ import cc.xypp.damage_number.DamageNumber;
 import cc.xypp.damage_number.data.DamageListItem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.client.gui.ForgeIngameGui;
-import net.minecraftforge.client.gui.IIngameOverlay;
 import cc.xypp.damage_number.Config;
+import net.minecraftforge.client.gui.overlay.ForgeGui;
+import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 import net.minecraftforge.fml.ModList;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Date;
 
-public class DamageRender implements IIngameOverlay {
+public class DamageRender implements IGuiOverlay {
     private long shakeDiff = 0;
     private long confirmTime = 0;
 
@@ -27,36 +27,42 @@ public class DamageRender implements IIngameOverlay {
         }
     }
 
+
+    private String i18n(String s, Object... args) {
+        return I18n.get(String.valueOf(new ResourceLocation(DamageNumber.MODID, s)), args);
+    }
+
+
     @Override
-    public void render(ForgeIngameGui gui, PoseStack poseStack, float partialTick, int screenWidth, int screenHeight) {
+    public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
         if (!Config.showDamage) return;
         if (!Data.show) return;
         {//TITLE Render
             float scale = (float) Config.titleScale;
-            poseStack.pushPose();
-            poseStack.scale(scale, scale, scale);
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().scale(scale, scale, scale);
             int x = valTransform(Config.titleX, screenWidth);
             int y = valTransform(Config.titleY, screenHeight);
             x = (int) (x / scale);
             y = (int) (y / scale);
-            GuiComponent.drawString(poseStack, gui.getFont(), i18n("title.content"), x, y, 0xFFFFFF);
-            poseStack.popPose();
+            guiGraphics.drawString(gui.getFont(), i18n("title.content"), x, y, 0xFFFFFF);
+            guiGraphics.pose().popPose();
         }//TITLE Render
         {//COMBO Render
             float scale = (float) Config.comboScale;
-            poseStack.pushPose();
-            poseStack.scale(scale, scale, scale);
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().scale(scale, scale, scale);
             int x = valTransform(Config.comboX, screenWidth);
             int y = valTransform(Config.comboY, screenHeight);
             x = (int) (x / scale);
             y = (int) (y / scale);
-            GuiComponent.drawString(poseStack, gui.getFont(), i18n("combo.content",  String.valueOf(Data.combo)), x, y, 0xFFFFFF);
-            poseStack.popPose();
+            guiGraphics.drawString(gui.getFont(), i18n("combo.content",  String.valueOf(Data.combo)), x, y, 0xFFFFFF);
+            guiGraphics.pose().popPose();
         }//COMBO Render
         {//List Render
             float scale = (float) Config.damageListScale;
-            poseStack.pushPose();
-            poseStack.scale(scale, scale, scale);
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().scale(scale, scale, scale);
             int x = valTransform(Config.damageListX, screenWidth);
             int y = valTransform(Config.damageListY, screenHeight);
             int lh = gui.getFont().lineHeight;
@@ -70,20 +76,20 @@ public class DamageRender implements IIngameOverlay {
             for (Pair<DamageListItem, Long> pair : Data.latest) {
                 if(pair.getLeft().shield!=-1){
                     cc.xypp.battery_shield.data.DamageNumberType damageNumberType = cc.xypp.battery_shield.data.DamageNumberType.values()[pair.getLeft().shield];
-                    GuiComponent.drawString(poseStack, gui.getFont(), i18n("damage_list.content",pair.getLeft().amount), x, y, cc.xypp.battery_shield.utils.ShieldUtil.getColor(damageNumberType));
-                    cc.xypp.battery_shield.utils.ShieldUtil.getIconByType(cc.xypp.battery_shield.data.DamageNumberType.values()[pair.getLeft().shield]).blit(poseStack,0,0);
+                    guiGraphics.drawString(gui.getFont(), i18n("damage_list.content",String.format("%.1f",pair.getLeft().amount)), x+20, y, cc.xypp.battery_shield.utils.ShieldUtil.getColor(damageNumberType));
+                    cc.xypp.battery_shield.utils.ShieldUtil.getIconByType(cc.xypp.battery_shield.data.DamageNumberType.values()[pair.getLeft().shield]).blit(guiGraphics,x,y);
                 }else{
-                    GuiComponent.drawString(poseStack, gui.getFont(), i18n("damage_list.content",String.format("%.1f",pair.getLeft().amount)), x, y, 0xffffffff);
+                    guiGraphics.drawString(gui.getFont(), i18n("damage_list.content",String.format("%.1f",pair.getLeft().amount)), x, y, 0xffffffff);
                 }
                 y += lh;
             }
 
-            poseStack.popPose();
+            guiGraphics.pose().popPose();
         }//List Render
         {//Number Render
             float scale = (float) Config.numberScale;
-            poseStack.pushPose();
-            poseStack.scale(scale, scale, scale);
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().scale(scale, scale, scale);
             int x = valTransform(Config.numberX, screenWidth);
             int y = valTransform(Config.numberY, screenHeight);
             x = (int) (x / scale);
@@ -113,20 +119,13 @@ public class DamageRender implements IIngameOverlay {
                     y -= 1;
                 }
             }
-            GuiComponent.drawString(poseStack,
+            guiGraphics.drawString(
                     gui.getFont(),
                     i18n("number.content",String.format("%.1f",Data.amount)),
                     x,
                     y,
                     Data.confirm ? 0xf9a825 : 0xFFFFFF);
-            poseStack.popPose();
+            guiGraphics.pose().popPose();
         }//Number Render
-
     }
-
-    private String i18n(String s, Object... args) {
-        return I18n.get(String.valueOf(new ResourceLocation(DamageNumber.MODID, s)), args);
-    }
-
-
 }

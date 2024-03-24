@@ -59,7 +59,8 @@ public class ServerEvent {
                 int shield = -1;
                 if(ModList.get().isLoaded("battery_shield")){
                     cc.xypp.battery_shield.api.IDamageSourceA sourceA = (cc.xypp.battery_shield.api.IDamageSourceA)event.getSource();
-                    shield= sourceA.getShieldDamageType().ordinal();
+                    if(sourceA.isByBatteryShield())
+                        shield= sourceA.getShieldDamageType().ordinal();
                 }
                 Network.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) entity),
                         new DamagePackage("emit",
