@@ -9,7 +9,7 @@ version = mod_version
 group = mod_group_id
 
 base {
-    archivesName = mod_id
+    archivesName = minecraft_version+"-"+mod_id
 }
 
 // Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
@@ -122,6 +122,16 @@ repositories {
     // flatDir {
     //     dir 'libs'
     // }
+    exclusiveContent {
+        forRepository {
+            maven {
+                url "https://cursemaven.com"
+            }
+        }
+        filter {
+            includeGroup "curse.maven"
+        }
+    }
 }
 
 dependencies {
@@ -145,7 +155,7 @@ dependencies {
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
-    compileOnly files('lib/battery_shield-1.0.jar')
+    compileOnly "curse.maven:battery-shield-997220:5232094"
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

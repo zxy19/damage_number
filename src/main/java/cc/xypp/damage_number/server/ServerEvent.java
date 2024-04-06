@@ -51,22 +51,25 @@ public class ServerEvent {
         @SubscribeEvent(priority = EventPriority.LOWEST)
         public static void onDamagePost(LivingDamageEvent event) {
             Entity entity = event.getSource().getEntity();
+            float amount = event.getAmount();
             if (entity != null && entity.getType() == net.minecraft.world.entity.EntityType.PLAYER) {
                 String uid = entity.getUUID().toString();
-                damageCount.put(uid, damageCount.getOrDefault(uid, 0) + 1);
-                userDamage.put(uid, event.getAmount() + userDamage.getOrDefault(uid, 0.0f));
-                keepUntil.put(uid, new Date().getTime() + 3000);
                 int shield = -1;
                 if(ModList.get().isLoaded("battery_shield")){
                     cc.xypp.battery_shield.api.IDamageSourceA sourceA = (cc.xypp.battery_shield.api.IDamageSourceA)event.getSource();
-                    if(sourceA.isByBatteryShield())
-                        shield= sourceA.getShieldDamageType().ordinal();
+                    if(sourceA.isByBatteryShield()) {
+                        shield = sourceA.getShieldDamageType().ordinal();
+                        amount = sourceA.getShieldDamage();
+                    }
                 }
+                damageCount.put(uid, damageCount.getOrDefault(uid, 0) + 1);
+                userDamage.put(uid,  amount+ userDamage.getOrDefault(uid, 0.0f));
+                keepUntil.put(uid, new Date().getTime() + 3000);
                 Network.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) entity),
                         new DamagePackage("emit",
                                 userDamage.get(uid),
                                 damageCount.get(uid),
-                                event.getAmount(),shield));
+                                amount,shield));
             }
         }
     }
