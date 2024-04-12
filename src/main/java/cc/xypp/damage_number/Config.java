@@ -175,6 +175,7 @@ public class Config
     public static boolean comboRankColorCombo;
 
 
+    @SuppressWarnings("unchecked")
     private static boolean validateColorTitle(final Object obj)
     {
         if(! (obj instanceof List))
