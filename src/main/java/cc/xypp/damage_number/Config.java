@@ -93,7 +93,7 @@ public class Config
     private static final ForgeConfigSpec.BooleanValue DAMAGE_RANK_COLOR_NUMBER =  BUILDER
             .comment("Color the damage number")
             .translation("config.damage_number.damage_rank.color_number")
-            .define("damage_rank.color.number", false);
+            .define("damage_rank.color.number", true);
     private static final ForgeConfigSpec.BooleanValue DAMAGE_RANK_COLOR_TITLE =  BUILDER
             .comment("Color the title")
             .translation("config.damage_number.damage_rank.color_title")
@@ -117,7 +117,7 @@ public class Config
     private static final ForgeConfigSpec.BooleanValue COMBO_RANK_COLOR_NUMBER =  BUILDER
             .comment("Color the damage number")
             .translation("config.damage_number.damage_rank.color_number")
-            .define("combo_rank.enable", false);
+            .define("combo_rank.color.number", true);
     private static final ForgeConfigSpec.BooleanValue COMBO_RANK_COLOR_TITLE =  BUILDER
             .comment("Color the title")
             .translation("config.damage_number.damage_rank.color_title")
