@@ -12,6 +12,7 @@ import cc.xypp.damage_number.Config;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Date;
+import java.util.List;
 
 public class DamageRender implements IGuiOverlay {
     private long shakeDiff = 0;
@@ -29,6 +30,54 @@ public class DamageRender implements IGuiOverlay {
     public void render(ForgeGui gui, PoseStack poseStack, float partialTick, int screenWidth, int screenHeight) {
         if (!Config.showDamage) return;
         if (!Data.show) return;
+        String titleContent = i18n("title.content");
+        long titleColor = 0xFFFFFF;
+        long damageColor = 0xFFFFFF;
+        long comboColor = 0xFFFFFF;
+
+        {//RANK OPT
+            long RankColor = 0xFFFFFF;
+            if (Config.damageRankEnabled) {
+                long maxRankData = -1;
+                for (Config.RankOptionItem item : Config.damageRankList) {
+                    if (item.amount <= Data.amount && item.amount > maxRankData) {
+                        maxRankData = item.amount;
+                        titleContent = item.title;
+                        RankColor = item.color;
+                    }
+                }
+                if(Config.damageRankColorDamageNumber){
+                    damageColor = RankColor;
+                }
+                if(Config.damageRankColorTitle){
+                    titleColor = RankColor;
+                }
+                if(Config.damageRankColorCombo){
+                    comboColor = RankColor;
+                }
+            }
+            if (Config.comboRankEnabled) {
+                long maxRankData = -1;
+                for (Config.RankOptionItem item : Config.comboRankList) {
+                    if (item.amount <= Data.combo && item.amount > maxRankData) {
+                        maxRankData = item.amount;
+                        titleContent = item.title;
+                        RankColor = item.color;
+                    }
+                }
+                if(Config.comboRankColorDamageNumber){
+                    damageColor = RankColor;
+                }
+                if(Config.comboRankColorTitle){
+                    titleColor = RankColor;
+                }
+                if(Config.comboRankColorCombo){
+                    comboColor = RankColor;
+                }
+            }
+        }//RANK OPT
+
+
         {//TITLE Render
             float scale = (float) Config.titleScale;
             poseStack.pushPose();
@@ -37,7 +86,9 @@ public class DamageRender implements IGuiOverlay {
             int y = valTransform(Config.titleY, screenHeight);
             x = (int) (x / scale);
             y = (int) (y / scale);
-            GuiComponent.drawString(poseStack, gui.getFont(), i18n("title.content"), x, y, 0xFFFFFF);
+
+
+            GuiComponent.drawString(poseStack, gui.getFont(), titleContent, x, y, (int) titleColor);
             poseStack.popPose();
         }//TITLE Render
         {//COMBO Render
@@ -48,7 +99,7 @@ public class DamageRender implements IGuiOverlay {
             int y = valTransform(Config.comboY, screenHeight);
             x = (int) (x / scale);
             y = (int) (y / scale);
-            GuiComponent.drawString(poseStack, gui.getFont(), i18n("combo.content", String.valueOf(Data.combo)), x, y, 0xFFFFFF);
+            GuiComponent.drawString(poseStack, gui.getFont(), i18n("combo.content", String.valueOf(Data.combo)), x, y, (int)comboColor);
             poseStack.popPose();
         }//COMBO Render
         {//List Render
@@ -62,11 +113,11 @@ public class DamageRender implements IGuiOverlay {
             y = (int) (y / scale);
             lh = (int) (lh / scale);
             long currentTime = new Date().getTime();
-            while (Data.latest.size()>0 && Data.latest.get(0).getRight() < currentTime - 2000) {
+            while (Data.latest.size() > 0 && Data.latest.get(0).getRight() < currentTime - 2000) {
                 Data.latest.remove(0);
             }
             for (Pair<Float, Long> pair : Data.latest) {
-                GuiComponent.drawString(poseStack, gui.getFont(), i18n("damage_list.content", String.format("%.1f",pair.getLeft())), x, y, 0xFFFFFF);
+                GuiComponent.drawString(poseStack, gui.getFont(), i18n("damage_list.content", String.format("%.1f", pair.getLeft())), x, y, 0xFFFFFF);
                 y += lh;
             }
 
@@ -107,10 +158,10 @@ public class DamageRender implements IGuiOverlay {
             }
             GuiComponent.drawString(poseStack,
                     gui.getFont(),
-                    i18n("number.content", String.format("%.1f",Data.amount)),
+                    i18n("number.content", String.format("%.1f", Data.amount)),
                     x,
                     y,
-                    Data.confirm ? 0xf9a825 : 0xFFFFFF);
+                    Data.confirm ? 0xf9a825 : (int)damageColor);
             poseStack.popPose();
         }//Number Render
     }
