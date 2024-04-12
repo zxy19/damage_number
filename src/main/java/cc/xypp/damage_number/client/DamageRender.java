@@ -29,6 +29,53 @@ public class DamageRender implements IIngameOverlay {
     public void render(ForgeIngameGui gui, PoseStack poseStack, float partialTick, int screenWidth, int screenHeight) {
         if (!Config.showDamage) return;
         if (!Data.show) return;
+        String titleContent = i18n("title.content");
+        long titleColor = 0xFFFFFF;
+        long damageColor = 0xFFFFFF;
+        long comboColor = 0xFFFFFF;
+
+        {//RANK OPT
+            long RankColor = 0xFFFFFF;
+            if (Config.damageRankEnabled) {
+                long maxRankData = -1;
+                for (Config.RankOptionItem item : Config.damageRankList) {
+                    if (item.amount <= Data.amount && item.amount > maxRankData) {
+                        maxRankData = item.amount;
+                        titleContent = item.title;
+                        RankColor = item.color;
+                    }
+                }
+                if(Config.damageRankColorDamageNumber){
+                    damageColor = RankColor;
+                }
+                if(Config.damageRankColorTitle){
+                    titleColor = RankColor;
+                }
+                if(Config.damageRankColorCombo){
+                    comboColor = RankColor;
+                }
+            }
+            if (Config.comboRankEnabled) {
+                long maxRankData = -1;
+                for (Config.RankOptionItem item : Config.comboRankList) {
+                    if (item.amount <= Data.combo && item.amount > maxRankData) {
+                        maxRankData = item.amount;
+                        titleContent = item.title;
+                        RankColor = item.color;
+                    }
+                }
+                if(Config.comboRankColorDamageNumber){
+                    damageColor = RankColor;
+                }
+                if(Config.comboRankColorTitle){
+                    titleColor = RankColor;
+                }
+                if(Config.comboRankColorCombo){
+                    comboColor = RankColor;
+                }
+            }
+        }//RANK OPT
+
         {//TITLE Render
             float scale = (float) Config.titleScale;
             poseStack.pushPose();
@@ -37,7 +84,7 @@ public class DamageRender implements IIngameOverlay {
             int y = valTransform(Config.titleY, screenHeight);
             x = (int) (x / scale);
             y = (int) (y / scale);
-            GuiComponent.drawString(poseStack, gui.getFont(), i18n("title.content"), x, y, 0xFFFFFF);
+            GuiComponent.drawString(poseStack, gui.getFont(), titleContent, x, y, (int) titleColor);
             poseStack.popPose();
         }//TITLE Render
         {//COMBO Render
@@ -48,7 +95,7 @@ public class DamageRender implements IIngameOverlay {
             int y = valTransform(Config.comboY, screenHeight);
             x = (int) (x / scale);
             y = (int) (y / scale);
-            GuiComponent.drawString(poseStack, gui.getFont(), i18n("combo.content",  String.valueOf(Data.combo)), x, y, 0xFFFFFF);
+            GuiComponent.drawString(poseStack, gui.getFont(), i18n("combo.content",  String.valueOf(Data.combo)), x, y, (int)comboColor);
             poseStack.popPose();
         }//COMBO Render
         {//List Render
@@ -110,7 +157,7 @@ public class DamageRender implements IIngameOverlay {
                     i18n("number.content",String.format("%.1f",Data.amount)),
                     x,
                     y,
-                    Data.confirm ? 0xf9a825 : 0xFFFFFF);
+                    Data.confirm ? 0xf9a825 : (int)damageColor);
             poseStack.popPose();
         }//Number Render
 
