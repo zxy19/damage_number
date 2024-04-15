@@ -84,10 +84,11 @@ public class DamageRender implements IGuiOverlay {
             }
         }//RANK OPT
 
-        {//TITLE Render
+        if(Config.titleShow){//TITLE Render
             float scale = (float) Config.titleScale;
             guiGraphics.pose().pushPose();
             guiGraphics.pose().scale(scale, scale, scale);
+            guiGraphics.setColor(1,1,1,Config.titleOpacity);
             int x = valTransform(Config.titleX, screenWidth);
             int y = valTransform(Config.titleY, screenHeight);
             x = (int) (x / scale);
@@ -95,10 +96,11 @@ public class DamageRender implements IGuiOverlay {
             guiGraphics.drawString(gui.getFont(), titleContent, x, y, (int)titleColor);
             guiGraphics.pose().popPose();
         }//TITLE Render
-        {//COMBO Render
+        if(Config.comboShow){//COMBO Render
             float scale = (float) Config.comboScale;
             guiGraphics.pose().pushPose();
             guiGraphics.pose().scale(scale, scale, scale);
+            guiGraphics.setColor(1,1,1,Config.comboOpacity);
             int x = valTransform(Config.comboX, screenWidth);
             int y = valTransform(Config.comboY, screenHeight);
             x = (int) (x / scale);
@@ -106,10 +108,11 @@ public class DamageRender implements IGuiOverlay {
             guiGraphics.drawString(gui.getFont(), i18n("combo.content",  String.valueOf(Data.combo)), x, y, (int)comboColor);
             guiGraphics.pose().popPose();
         }//COMBO Render
-        {//List Render
+        if(Config.damageListShow){//List Render
             float scale = (float) Config.damageListScale;
             guiGraphics.pose().pushPose();
             guiGraphics.pose().scale(scale, scale, scale);
+            guiGraphics.setColor(1,1,1,Config.damageListOpacity);
             int x = valTransform(Config.damageListX, screenWidth);
             int y = valTransform(Config.damageListY, screenHeight);
             int lh = gui.getFont().lineHeight;
@@ -120,6 +123,7 @@ public class DamageRender implements IGuiOverlay {
             while (Data.latest.size()>0 && Data.latest.get(0).getRight() < currentTime - 2000) {
                 Data.latest.remove(0);
             }
+
             for (Pair<DamageListItem, Long> pair : Data.latest) {
                 if(pair.getLeft().shield!=-1){
                     cc.xypp.battery_shield.data.DamageNumberType damageNumberType = cc.xypp.battery_shield.data.DamageNumberType.values()[pair.getLeft().shield];
@@ -133,10 +137,11 @@ public class DamageRender implements IGuiOverlay {
 
             guiGraphics.pose().popPose();
         }//List Render
-        {//Number Render
+        if(Config.numberShow){//Number Render
             float scale = (float) Config.numberScale;
             guiGraphics.pose().pushPose();
             guiGraphics.pose().scale(scale, scale, scale);
+            guiGraphics.setColor(1,1,1,Config.numberOpacity);
             int x = valTransform(Config.numberX, screenWidth);
             int y = valTransform(Config.numberY, screenHeight);
             x = (int) (x / scale);
@@ -174,5 +179,6 @@ public class DamageRender implements IGuiOverlay {
                     Data.confirm ? 0xf9a825 : (int)damageColor);
             guiGraphics.pose().popPose();
         }//Number Render
+        guiGraphics.setColor(1,1,1,1);
     }
 }
