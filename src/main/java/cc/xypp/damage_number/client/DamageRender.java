@@ -1,7 +1,6 @@
 package cc.xypp.damage_number.client;
 
 import cc.xypp.damage_number.DamageNumber;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
@@ -30,7 +29,6 @@ public class DamageRender implements IIngameOverlay {
     public void render(ForgeIngameGui gui, PoseStack poseStack, float partialTick, int screenWidth, int screenHeight) {
         if (!Config.showDamage) return;
         if (!Data.show) return;
-        RenderSystem.enableBlend();
         String titleContent = i18n("title.content");
         long titleColor = 0xFFFFFF;
         long damageColor = 0xFFFFFF;
@@ -163,7 +161,6 @@ public class DamageRender implements IIngameOverlay {
             poseStack.popPose();
         }//Number Render
 
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
     private String i18n(String s, Object... args) {
