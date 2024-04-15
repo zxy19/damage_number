@@ -40,9 +40,12 @@ public class Config
     private static final ForgeConfigSpec.ConfigValue<Integer> NUMBER_Y =  BUILDER
             .translation("config.damage_number.number.y")
             .define("number.y", 100);
-    private static final ForgeConfigSpec.ConfigValue<Float> NUMBER_SCALE =  BUILDER
+    private static final ForgeConfigSpec.DoubleValue NUMBER_SCALE =  BUILDER
             .translation("config.damage_number.number.scale")
-            .define("number.scale", 2.5f);
+            .defineInRange("number.scale", 2.5,0.0,10.0);
+    private static final ForgeConfigSpec.DoubleValue NUMBER_OPACITY =  BUILDER
+            .translation("config.damage_number.number.opacity")
+            .defineInRange("number.opacity", 1.0,0.0,1.0);
     private static final ForgeConfigSpec.BooleanValue NUMBER_SHOW =  BUILDER
             .translation("config.damage_number.number.show")
             .define("number.show", true);
@@ -53,9 +56,12 @@ public class Config
     private static final ForgeConfigSpec.ConfigValue<Integer> TITLE_Y =  BUILDER
             .translation("config.damage_number.title.y")
             .define("title.y", 75);
-    private static final ForgeConfigSpec.ConfigValue<Float> TITLE_SCALE =  BUILDER
+    private static final ForgeConfigSpec.DoubleValue TITLE_SCALE =  BUILDER
             .translation("config.damage_number.title.scale")
-            .define("title.scale", 1.8f);
+            .defineInRange("title.scale", 1.8,0.0,10.0);
+    private static final ForgeConfigSpec.DoubleValue TITLE_OPACITY =  BUILDER
+            .translation("config.damage_number.title.opacity")
+            .defineInRange("title.opacity", 1.0,0.0,1.0);
     private static final ForgeConfigSpec.BooleanValue TITLE_SHOW =  BUILDER
             .translation("config.damage_number.title.show")
             .define("title.show", true);
@@ -66,9 +72,12 @@ public class Config
     private static final ForgeConfigSpec.ConfigValue<Integer> COMBO_Y =  BUILDER
             .translation("config.damage_number.combo.y")
             .define("combo.y", 125);
-    private static final ForgeConfigSpec.ConfigValue<Float>  COMBO_SCALE = BUILDER
+    private static final ForgeConfigSpec.DoubleValue  COMBO_OPACITY = BUILDER
+            .translation("config.damage_number.combo.opacity")
+            .defineInRange("combo.opacity", 1.0,0.0,1.0);
+    private static final ForgeConfigSpec.DoubleValue  COMBO_SCALE = BUILDER
             .translation("config.damage_number.combo.scale")
-            .define("combo.scale", 1.2f);
+            .defineInRange("combo.scale", 1.2,0.0,10.0);
     private static final ForgeConfigSpec.BooleanValue COMBO_SHOW =  BUILDER
             .translation("config.damage_number.combo.show")
             .define("combo.show", true);
@@ -79,9 +88,12 @@ public class Config
     private static final ForgeConfigSpec.ConfigValue<Integer> DAMAGE_LIST_Y =  BUILDER
             .translation("config.damage_number.damage_list.y")
             .define("damage_list.y", 100);
-    private static final ForgeConfigSpec.ConfigValue<Float>  DAMAGE_LIST_SCALE = BUILDER
+    private static final ForgeConfigSpec.DoubleValue  DAMAGE_LIST_OPACITY = BUILDER
+            .translation("config.damage_number.damage_list.opacity")
+            .defineInRange("damage_list.opacity", 1.0,0.0,1.0);
+    private static final ForgeConfigSpec.DoubleValue  DAMAGE_LIST_SCALE = BUILDER
             .translation("config.damage_number.damage_list.scale")
-            .define("damage_list.scale", 0.8f);
+            .defineInRange("damage_list.scale", 0.8,0.0,10.0);
     private static final ForgeConfigSpec.BooleanValue DAMAGE_LIST_SHOW =  BUILDER
             .translation("config.damage_number.damage_list.show")
             .define("damage_list.show", true);
@@ -140,24 +152,28 @@ public class Config
     public static int numberX;
     public static int numberY;
     public static float numberScale;
+    public static float numberOpacity;
     public static boolean numberShow;
 
     //Title Options
     public static int titleX;
     public static int titleY;
     public static float titleScale;
+    public static float titleOpacity;
     public static boolean titleShow;
 
     //Combo Options
     public static int comboX;
     public static int comboY;
     public static float comboScale;
+    public static float comboOpacity;
     public static boolean comboShow;
 
     //Damage List Options
     public static int damageListX;
     public static int damageListY;
     public static float damageListScale;
+    public static float damageListOpacity;
     public static boolean damageListShow;
 
     //Damage Rank Options
@@ -194,19 +210,23 @@ public class Config
         showDamage = SHOW_DAMAGE.get();
         numberX = NUMBER_X.get();
         numberY = NUMBER_Y.get();
-        numberScale = NUMBER_SCALE.get();
+        numberScale = (float) (double)NUMBER_SCALE.get();
+        numberOpacity = (float) (double)NUMBER_OPACITY.get();
         numberShow = NUMBER_SHOW.get();
         titleX = TITLE_X.get();
         titleY = TITLE_Y.get();
-        titleScale = TITLE_SCALE.get();
+        titleScale = (float) (double)TITLE_SCALE.get();
+        titleOpacity = (float) (double)TITLE_OPACITY.get();
         titleShow = TITLE_SHOW.get();
         comboX = COMBO_X.get();
         comboY = COMBO_Y.get();
-        comboScale = COMBO_SCALE.get();
+        comboScale = (float) (double)COMBO_SCALE.get();
+        comboOpacity = (float) (double)COMBO_OPACITY.get();
         comboShow = COMBO_SHOW.get();
         damageListX = DAMAGE_LIST_X.get();
         damageListY = DAMAGE_LIST_Y.get();
-        damageListScale = DAMAGE_LIST_SCALE.get();
+        damageListScale = (float) (double)DAMAGE_LIST_SCALE.get();
+        damageListOpacity = (float) (double)DAMAGE_LIST_OPACITY.get();
         damageListShow = DAMAGE_LIST_SHOW.get();
         damageRankEnabled = DAMAGE_RANK_USE.get();
         damageRankList = DAMAGE_RANK_OPT.get().stream().map(item->{

@@ -46,13 +46,13 @@ public class DamageRender implements IGuiOverlay {
                         RankColor = item.color;
                     }
                 }
-                if(Config.damageRankColorDamageNumber){
+                if (Config.damageRankColorDamageNumber) {
                     damageColor = RankColor;
                 }
-                if(Config.damageRankColorTitle){
+                if (Config.damageRankColorTitle) {
                     titleColor = RankColor;
                 }
-                if(Config.damageRankColorCombo){
+                if (Config.damageRankColorCombo) {
                     comboColor = RankColor;
                 }
             }
@@ -65,20 +65,20 @@ public class DamageRender implements IGuiOverlay {
                         RankColor = item.color;
                     }
                 }
-                if(Config.comboRankColorDamageNumber){
+                if (Config.comboRankColorDamageNumber) {
                     damageColor = RankColor;
                 }
-                if(Config.comboRankColorTitle){
+                if (Config.comboRankColorTitle) {
                     titleColor = RankColor;
                 }
-                if(Config.comboRankColorCombo){
+                if (Config.comboRankColorCombo) {
                     comboColor = RankColor;
                 }
             }
         }//RANK OPT
 
 
-        {//TITLE Render
+        if (Config.titleShow) {//TITLE Render
             float scale = (float) Config.titleScale;
             poseStack.pushPose();
             poseStack.scale(scale, scale, scale);
@@ -88,10 +88,10 @@ public class DamageRender implements IGuiOverlay {
             y = (int) (y / scale);
 
 
-            GuiComponent.drawString(poseStack, gui.getFont(), titleContent, x, y, (int) titleColor);
+            GuiComponent.drawString(poseStack, gui.getFont(), titleContent, x, y, ((int) titleColor) | ((int) (Config.titleOpacity * 255) << 24));
             poseStack.popPose();
         }//TITLE Render
-        {//COMBO Render
+        if (Config.comboShow) {//COMBO Render
             float scale = (float) Config.comboScale;
             poseStack.pushPose();
             poseStack.scale(scale, scale, scale);
@@ -99,10 +99,10 @@ public class DamageRender implements IGuiOverlay {
             int y = valTransform(Config.comboY, screenHeight);
             x = (int) (x / scale);
             y = (int) (y / scale);
-            GuiComponent.drawString(poseStack, gui.getFont(), i18n("combo.content", String.valueOf(Data.combo)), x, y, (int)comboColor);
+            GuiComponent.drawString(poseStack, gui.getFont(), i18n("combo.content", String.valueOf(Data.combo)), x, y, ((int) comboColor) | ((int) (Config.comboOpacity * 255) << 24));
             poseStack.popPose();
         }//COMBO Render
-        {//List Render
+        if (Config.damageListShow) {//List Render
             float scale = (float) Config.damageListScale;
             poseStack.pushPose();
             poseStack.scale(scale, scale, scale);
@@ -117,13 +117,13 @@ public class DamageRender implements IGuiOverlay {
                 Data.latest.remove(0);
             }
             for (Pair<Float, Long> pair : Data.latest) {
-                GuiComponent.drawString(poseStack, gui.getFont(), i18n("damage_list.content", String.format("%.1f", pair.getLeft())), x, y, 0xFFFFFF);
+                GuiComponent.drawString(poseStack, gui.getFont(), i18n("damage_list.content", String.format("%.1f", pair.getLeft())), x, y, (0xFFFFFF) | ((int) (Config.damageListOpacity * 255) << 24));
                 y += lh;
             }
 
             poseStack.popPose();
         }//List Render
-        {//Number Render
+        if (Config.numberShow) {//Number Render
             float scale = (float) Config.numberScale;
             poseStack.pushPose();
             poseStack.scale(scale, scale, scale);
@@ -161,7 +161,7 @@ public class DamageRender implements IGuiOverlay {
                     i18n("number.content", String.format("%.1f", Data.amount)),
                     x,
                     y,
-                    Data.confirm ? 0xf9a825 : (int)damageColor);
+                    (Data.confirm ? 0xf9a825 : (int) damageColor) | ((int) (Config.numberOpacity * 255) << 24));
             poseStack.popPose();
         }//Number Render
     }
