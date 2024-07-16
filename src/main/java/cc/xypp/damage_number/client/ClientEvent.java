@@ -61,7 +61,7 @@ public class ClientEvent {
         }
     }
 
-    @Mod.EventBusSubscriber(modid = DamageNumber.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+    @Mod.EventBusSubscriber(modid = DamageNumber.MODID,value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
     public static class FM {
         @SubscribeEvent
         public static void keyInput(InputEvent event) {
