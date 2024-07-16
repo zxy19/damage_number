@@ -4,7 +4,7 @@
   "damage_number:damage_list.content": " +%s",
   "damage_number:number.content": "%s",
   "damage_number:config.title": "Config Screen",
-  "key.damage_number.show_config": "Show Config Screen",
+  "key.damage_number.show_config": "显示伤害数字配置",
   "damage_number:config.setting": "配置",
   "damage_number:config.x": "X",
   "damage_number:config.y": "Y",
