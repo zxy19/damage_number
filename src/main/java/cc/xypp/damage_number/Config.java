@@ -94,6 +94,9 @@ public class Config
     private static final ForgeConfigSpec.DoubleValue  DAMAGE_LIST_SCALE = BUILDER
             .translation("config.damage_number.damage_list.scale")
             .defineInRange("damage_list.scale", 0.8,0.0,10.0);
+    private static final ForgeConfigSpec.ConfigValue<Integer> DAMAGE_LIST_MAX_SIZE =  BUILDER
+            .translation("config.damage_number.damage_list.max_size")
+            .define("damage_list.max_size", 100);
     private static final ForgeConfigSpec.BooleanValue DAMAGE_LIST_SHOW =  BUILDER
             .translation("config.damage_number.damage_list.show")
             .define("damage_list.show", true);
@@ -175,6 +178,7 @@ public class Config
     public static float damageListScale;
     public static float damageListOpacity;
     public static boolean damageListShow;
+    public static int damageListMaxSize;
 
     //Damage Rank Options
     public static List<RankOptionItem> damageRankList = new ArrayList<>();
@@ -227,6 +231,7 @@ public class Config
         damageListY = DAMAGE_LIST_Y.get();
         damageListScale = (float) (double)DAMAGE_LIST_SCALE.get();
         damageListOpacity = (float) (double)DAMAGE_LIST_OPACITY.get();
+        damageListMaxSize = DAMAGE_LIST_MAX_SIZE.get();
         damageListShow = DAMAGE_LIST_SHOW.get();
         damageRankEnabled = DAMAGE_RANK_USE.get();
         damageRankList = DAMAGE_RANK_OPT.get().stream().map(item->{
@@ -244,6 +249,40 @@ public class Config
         comboRankColorDamageNumber = COMBO_RANK_COLOR_NUMBER.get();
         comboRankColorTitle = COMBO_RANK_COLOR_TITLE.get();
         comboRankColorCombo = COMBO_RANK_COLOR_COMBO.get();
-
+    }
+    public static void save(){
+        SHOW_DAMAGE.set(showDamage);
+        NUMBER_X.set(numberX);
+        NUMBER_Y.set(numberY);
+        NUMBER_SCALE.set((double) numberScale);
+        NUMBER_OPACITY.set((double) numberOpacity);
+        NUMBER_SHOW.set(numberShow);
+        TITLE_X.set(titleX);
+        TITLE_Y.set(titleY);
+        TITLE_SCALE.set((double) titleScale);
+        TITLE_OPACITY.set((double) titleOpacity);
+        TITLE_SHOW.set(titleShow);
+        COMBO_X.set(comboX);
+        COMBO_Y.set(comboY);
+        COMBO_SCALE.set((double) comboScale);
+        COMBO_OPACITY.set((double) comboOpacity);
+        COMBO_SHOW.set(comboShow);
+        DAMAGE_LIST_X.set(damageListX);
+        DAMAGE_LIST_Y.set(damageListY);
+        DAMAGE_LIST_SCALE.set((double) damageListScale);
+        DAMAGE_LIST_OPACITY.set((double) damageListOpacity);
+        DAMAGE_LIST_MAX_SIZE.set(damageListMaxSize);
+        DAMAGE_LIST_SHOW.set(damageListShow);
+        DAMAGE_RANK_USE.set(damageRankEnabled);
+        DAMAGE_RANK_OPT.set(damageRankList.stream().map(item->item.amount+"|"+item.title+"|"+String.valueOf(item.color)).collect(Collectors.toList()));
+        DAMAGE_RANK_COLOR_NUMBER.set(damageRankColorDamageNumber);
+        DAMAGE_RANK_COLOR_TITLE.set(damageRankColorTitle);
+        DAMAGE_RANK_COLOR_COMBO.set(damageRankColorCombo);
+        COMBO_RANK_USE.set(comboRankEnabled);
+        COMBO_RANK_OPT.set(comboRankList.stream().map(item->item.amount+"|"+item.title+"|"+String.valueOf(item.color)).collect(Collectors.toList()));
+        COMBO_RANK_COLOR_NUMBER.set(comboRankColorDamageNumber);
+        COMBO_RANK_COLOR_TITLE.set(comboRankColorTitle);
+        COMBO_RANK_COLOR_COMBO.set(comboRankColorCombo);
+        SPEC.save();
     }
 }

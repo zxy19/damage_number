@@ -3,6 +3,7 @@ package cc.xypp.damage_number.client;
 import cc.xypp.damage_number.DamageNumber;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.resources.ResourceLocation;
@@ -28,8 +29,12 @@ public class DamageRender implements IGuiOverlay {
 
     @Override
     public void render(ForgeGui gui, PoseStack poseStack, float partialTick, int screenWidth, int screenHeight) {
+        this.render(poseStack, gui.getFont(), partialTick, screenWidth, screenHeight,false);
+    }
+
+    public void render(PoseStack poseStack, Font font, float partialTick, int screenWidth, int screenHeight,boolean alwaysShow){
         if (!Config.showDamage) return;
-        if (!Data.show) return;
+        if (!Data.show && !alwaysShow) return;
         String titleContent = i18n("title.content");
         long titleColor = 0xFFFFFF;
         long damageColor = 0xFFFFFF;
@@ -88,7 +93,7 @@ public class DamageRender implements IGuiOverlay {
             y = (int) (y / scale);
 
 
-            GuiComponent.drawString(poseStack, gui.getFont(), titleContent, x, y, ((int) titleColor) | ((int) (Config.titleOpacity * 255) << 24));
+            GuiComponent.drawString(poseStack, font, titleContent, x, y, ((int) titleColor) | ((int) (Config.titleOpacity * 255) << 24));
             poseStack.popPose();
         }//TITLE Render
         if (Config.comboShow) {//COMBO Render
@@ -99,7 +104,7 @@ public class DamageRender implements IGuiOverlay {
             int y = valTransform(Config.comboY, screenHeight);
             x = (int) (x / scale);
             y = (int) (y / scale);
-            GuiComponent.drawString(poseStack, gui.getFont(), i18n("combo.content", String.valueOf(Data.combo)), x, y, ((int) comboColor) | ((int) (Config.comboOpacity * 255) << 24));
+            GuiComponent.drawString(poseStack, font, i18n("combo.content", String.valueOf(Data.combo)), x, y, ((int) comboColor) | ((int) (Config.comboOpacity * 255) << 24));
             poseStack.popPose();
         }//COMBO Render
         if (Config.damageListShow) {//List Render
@@ -108,7 +113,7 @@ public class DamageRender implements IGuiOverlay {
             poseStack.scale(scale, scale, scale);
             int x = valTransform(Config.damageListX, screenWidth);
             int y = valTransform(Config.damageListY, screenHeight);
-            int lh = gui.getFont().lineHeight;
+            int lh = font.lineHeight;
             x = (int) (x / scale);
             y = (int) (y / scale);
             lh = (int) (lh / scale);
@@ -117,7 +122,7 @@ public class DamageRender implements IGuiOverlay {
                 Data.latest.remove(0);
             }
             for (Pair<Float, Long> pair : Data.latest) {
-                GuiComponent.drawString(poseStack, gui.getFont(), i18n("damage_list.content", String.format("%.1f", pair.getLeft())), x, y, (0xFFFFFF) | ((int) (Config.damageListOpacity * 255) << 24));
+                GuiComponent.drawString(poseStack, font, i18n("damage_list.content", String.format("%.1f", pair.getLeft())), x, y, (0xFFFFFF) | ((int) (Config.damageListOpacity * 255) << 24));
                 y += lh;
             }
 
@@ -157,7 +162,7 @@ public class DamageRender implements IGuiOverlay {
                 }
             }
             GuiComponent.drawString(poseStack,
-                    gui.getFont(),
+                    font,
                     i18n("number.content", String.format("%.1f", Data.amount)),
                     x,
                     y,
@@ -165,7 +170,6 @@ public class DamageRender implements IGuiOverlay {
             poseStack.popPose();
         }//Number Render
     }
-
     private String i18n(String s, Object... args) {
         return I18n.get(String.valueOf(new ResourceLocation(DamageNumber.MODID, s)), args);
     }
