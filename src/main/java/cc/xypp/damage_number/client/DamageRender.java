@@ -4,6 +4,7 @@ import cc.xypp.damage_number.DamageNumber;
 import cc.xypp.damage_number.data.DamageListItem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.resources.ResourceLocation;
@@ -35,8 +36,12 @@ public class DamageRender implements IGuiOverlay {
 
     @Override
     public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
+        this.render(guiGraphics, gui.getFont(), partialTick, screenWidth, screenHeight,false);
+    }
+
+    public void render(GuiGraphics guiGraphics, Font font, float partialTick, int screenWidth, int screenHeight,boolean alwaysShow){
         if (!Config.showDamage) return;
-        if (!Data.show) return;
+        if (!Data.show && !alwaysShow) return;
         String titleContent = i18n("title.content");
         long titleColor = 0xFFFFFF;
         long damageColor = 0xFFFFFF;
@@ -93,7 +98,7 @@ public class DamageRender implements IGuiOverlay {
             int y = valTransform(Config.titleY, screenHeight);
             x = (int) (x / scale);
             y = (int) (y / scale);
-            guiGraphics.drawString(gui.getFont(), titleContent, x, y, (int)titleColor);
+            guiGraphics.drawString(font, titleContent, x, y, (int)titleColor);
             guiGraphics.pose().popPose();
         }//TITLE Render
         if(Config.comboShow){//COMBO Render
@@ -105,7 +110,7 @@ public class DamageRender implements IGuiOverlay {
             int y = valTransform(Config.comboY, screenHeight);
             x = (int) (x / scale);
             y = (int) (y / scale);
-            guiGraphics.drawString(gui.getFont(), i18n("combo.content",  String.valueOf(Data.combo)), x, y, (int)comboColor);
+            guiGraphics.drawString(font, i18n("combo.content",  String.valueOf(Data.combo)), x, y, (int)comboColor);
             guiGraphics.pose().popPose();
         }//COMBO Render
         if(Config.damageListShow){//List Render
@@ -115,7 +120,7 @@ public class DamageRender implements IGuiOverlay {
             guiGraphics.setColor(1,1,1,Config.damageListOpacity);
             int x = valTransform(Config.damageListX, screenWidth);
             int y = valTransform(Config.damageListY, screenHeight);
-            int lh = gui.getFont().lineHeight;
+            int lh = font.lineHeight;
             x = (int) (x / scale);
             y = (int) (y / scale);
             lh = (int) (lh / scale);
@@ -127,10 +132,10 @@ public class DamageRender implements IGuiOverlay {
             for (Pair<DamageListItem, Long> pair : Data.latest) {
                 if(pair.getLeft().shield!=-1){
                     cc.xypp.battery_shield.data.DamageNumberType damageNumberType = cc.xypp.battery_shield.data.DamageNumberType.values()[pair.getLeft().shield];
-                    guiGraphics.drawString(gui.getFont(), i18n("damage_list.content",String.format("%.1f",pair.getLeft().amount)), x+20, y, cc.xypp.battery_shield.utils.ShieldUtil.getColor(damageNumberType));
+                    guiGraphics.drawString(font, i18n("damage_list.content",String.format("%.1f",pair.getLeft().amount)), x+20, y, cc.xypp.battery_shield.utils.ShieldUtil.getColor(damageNumberType));
                     cc.xypp.battery_shield.utils.ShieldUtil.getIconByType(cc.xypp.battery_shield.data.DamageNumberType.values()[pair.getLeft().shield]).blit(guiGraphics,x,y);
                 }else{
-                    guiGraphics.drawString(gui.getFont(), i18n("damage_list.content",String.format("%.1f",pair.getLeft().amount)), x, y, 0xffffffff);
+                    guiGraphics.drawString(font, i18n("damage_list.content",String.format("%.1f",pair.getLeft().amount)), x, y, 0xffffffff);
                 }
                 y += lh;
             }
@@ -172,7 +177,7 @@ public class DamageRender implements IGuiOverlay {
                 }
             }
             guiGraphics.drawString(
-                    gui.getFont(),
+                    font,
                     i18n("number.content",String.format("%.1f",Data.amount)),
                     x,
                     y,

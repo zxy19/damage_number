@@ -57,9 +57,9 @@ public class ServerEvent {
                 int shield = -1;
                 if(ModList.get().isLoaded("battery_shield")){
                     cc.xypp.battery_shield.api.IDamageSourceA sourceA = (cc.xypp.battery_shield.api.IDamageSourceA)event.getSource();
-                    if(sourceA.isByBatteryShield()) {
-                        shield = sourceA.getShieldDamageType().ordinal();
-                        amount = sourceA.getShieldDamage();
+                    if(sourceA.battery_shield$isByBatteryShield()) {
+                        shield = sourceA.battery_shield$getShieldDamageType().ordinal();
+                        amount = sourceA.battery_shield$getShieldDamage();
                     }
                 }
                 damageCount.put(uid, damageCount.getOrDefault(uid, 0) + 1);

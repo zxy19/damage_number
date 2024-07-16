@@ -29,4 +29,5 @@ public class DamageNumber
     void FMLCommonSetupEvent(FMLCommonSetupEvent event) {
         Network.INSTANCE.registerMessage(0, DamagePackage.class, DamagePackage::toBytes, DamagePackage::new, null);
     }
+
 }
