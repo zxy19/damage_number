@@ -2,5 +2,14 @@
   "damage_number:title.content": "Damage",
   "damage_number:combo.content": "%sX Combo",
   "damage_number:damage_list.content": " +%s",
-  "damage_number:number.content": "%s"
+  "damage_number:number.content": "%s",
+  "damage_number:config.title": "Config Screen",
+  "key.damage_number.show_config": "Show Config Screen",
+  "damage_number:config.setting": "Settings",
+  "damage_number:config.x": "X",
+  "damage_number:config.y": "Y",
+  "damage_number:config.scale": "Scale",
+  "damage_number:config.opacity": "Opacity",
+  "damage_number:config.select_key": "Part to modify",
+  "damage_number:config.max_size": "Max Size"
 }
