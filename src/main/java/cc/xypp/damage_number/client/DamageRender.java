@@ -2,20 +2,20 @@ package cc.xypp.damage_number.client;
 
 import cc.xypp.damage_number.DamageNumber;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 import cc.xypp.damage_number.Config;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Date;
 import java.util.List;
 
-public class DamageRender implements IGuiOverlay {
+public class DamageRender implements LayeredDraw.Layer {
     private long shakeDiff = 0;
     private long confirmTime = 0;
 
@@ -27,12 +27,13 @@ public class DamageRender implements IGuiOverlay {
         }
     }
 
-    @Override
-    public void render(ForgeGui gui, PoseStack poseStack, float partialTick, int screenWidth, int screenHeight) {
-        this.render(poseStack, gui.getFont(), partialTick, screenWidth, screenHeight,false);
-    }
 
-    public void render(PoseStack poseStack, Font font, float partialTick, int screenWidth, int screenHeight,boolean alwaysShow){
+
+    @Override
+    public void render(GuiGraphics pGuiGraphics, DeltaTracker pDeltaTracker) {
+        this.render(pGuiGraphics, Minecraft.getInstance().font, pDeltaTracker.getGameTimeDeltaPartialTick(true), pGuiGraphics.guiWidth(), pGuiGraphics.guiHeight(), false);
+    }
+    public void render(GuiGraphics guiGraphics, Font font, float partialTick, int screenWidth, int screenHeight, boolean alwaysShow){
         if (!Config.showDamage) return;
         if (!Data.show && !alwaysShow) return;
         String titleContent = i18n("title.content");
@@ -85,32 +86,32 @@ public class DamageRender implements IGuiOverlay {
 
         if (Config.titleShow) {//TITLE Render
             float scale = (float) Config.titleScale;
-            poseStack.pushPose();
-            poseStack.scale(scale, scale, scale);
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().scale(scale, scale, scale);
             int x = valTransform(Config.titleX, screenWidth);
             int y = valTransform(Config.titleY, screenHeight);
             x = (int) (x / scale);
             y = (int) (y / scale);
 
 
-            GuiComponent.drawString(poseStack, font, titleContent, x, y, ((int) titleColor) | ((int) (Config.titleOpacity * 255) << 24));
-            poseStack.popPose();
+            guiGraphics.drawString(font, titleContent, x, y, ((int) titleColor) | ((int) (Config.titleOpacity * 255) << 24));
+            guiGraphics.pose().popPose();
         }//TITLE Render
         if (Config.comboShow) {//COMBO Render
             float scale = (float) Config.comboScale;
-            poseStack.pushPose();
-            poseStack.scale(scale, scale, scale);
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().scale(scale, scale, scale);
             int x = valTransform(Config.comboX, screenWidth);
             int y = valTransform(Config.comboY, screenHeight);
             x = (int) (x / scale);
             y = (int) (y / scale);
-            GuiComponent.drawString(poseStack, font, i18n("combo.content", String.valueOf(Data.combo)), x, y, ((int) comboColor) | ((int) (Config.comboOpacity * 255) << 24));
-            poseStack.popPose();
+            guiGraphics.drawString(font, i18n("combo.content", String.valueOf(Data.combo)), x, y, ((int) comboColor) | ((int) (Config.comboOpacity * 255) << 24));
+            guiGraphics.pose().popPose();
         }//COMBO Render
         if (Config.damageListShow) {//List Render
             float scale = (float) Config.damageListScale;
-            poseStack.pushPose();
-            poseStack.scale(scale, scale, scale);
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().scale(scale, scale, scale);
             int x = valTransform(Config.damageListX, screenWidth);
             int y = valTransform(Config.damageListY, screenHeight);
             int lh = font.lineHeight;
@@ -122,16 +123,16 @@ public class DamageRender implements IGuiOverlay {
                 Data.latest.remove(0);
             }
             for (Pair<Float, Long> pair : Data.latest) {
-                GuiComponent.drawString(poseStack, font, i18n("damage_list.content", String.format("%.1f", pair.getLeft())), x, y, (0xFFFFFF) | ((int) (Config.damageListOpacity * 255) << 24));
+                guiGraphics.drawString(font, i18n("damage_list.content", String.format("%.1f", pair.getLeft())), x, y, (0xFFFFFF) | ((int) (Config.damageListOpacity * 255) << 24));
                 y += lh;
             }
 
-            poseStack.popPose();
+            guiGraphics.pose().popPose();
         }//List Render
         if (Config.numberShow) {//Number Render
             float scale = (float) Config.numberScale;
-            poseStack.pushPose();
-            poseStack.scale(scale, scale, scale);
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().scale(scale, scale, scale);
             int x = valTransform(Config.numberX, screenWidth);
             int y = valTransform(Config.numberY, screenHeight);
             x = (int) (x / scale);
@@ -161,16 +162,18 @@ public class DamageRender implements IGuiOverlay {
                     y -= 1;
                 }
             }
-            GuiComponent.drawString(poseStack,
+            guiGraphics.drawString(
                     font,
                     i18n("number.content", String.format("%.1f", Data.amount)),
                     x,
                     y,
                     (Data.confirm ? 0xf9a825 : (int) damageColor) | ((int) (Config.numberOpacity * 255) << 24));
-            poseStack.popPose();
+            guiGraphics.pose().popPose();
         }//Number Render
     }
     private String i18n(String s, Object... args) {
-        return I18n.get(String.valueOf(new ResourceLocation(DamageNumber.MODID, s)), args);
+        return I18n.get(String.valueOf(ResourceLocation.fromNamespaceAndPath(DamageNumber.MODID, s)), args);
     }
+
+
 }

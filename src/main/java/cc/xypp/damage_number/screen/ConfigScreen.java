@@ -4,18 +4,17 @@ import cc.xypp.damage_number.Config;
 import cc.xypp.damage_number.DamageNumber;
 import cc.xypp.damage_number.client.DamageRender;
 import cc.xypp.damage_number.client.Data;
-import cc.xypp.damage_number.widget.GridLayout;
-import cc.xypp.damage_number.widget.StringWidget;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
+import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -54,12 +53,13 @@ public class ConfigScreen extends Screen {
     protected void init() {
         super.init();
         this.addRenderableWidget(
-                new Button((this.width - BUTTON_WIDTH) / 2,
-                        this.height - DONE_BUTTON_TOP_OFFSET,
-                        BUTTON_WIDTH,
-                        BUTTON_HEIGHT,
+                new Button.Builder(
                         Component.translatable("gui.done"),
-                        button -> this.onClose())
+                        button -> this.onClose()
+                )
+                        .pos((this.width - BUTTON_WIDTH) / 2, this.height - DONE_BUTTON_TOP_OFFSET)
+                        .size(BUTTON_WIDTH, BUTTON_HEIGHT)
+                        .build()
         );
         this.layout = new GridLayout(CONFIG_PANE_WIDTH, this.height - DONE_BUTTON_TOP_OFFSET);
         GridLayout.RowHelper row = this.layout.createRowHelper(2);
@@ -117,15 +117,15 @@ public class ConfigScreen extends Screen {
 
 
     @Override
-    public void render(@NotNull PoseStack poseStack, int pMouseX, int pMouseY, float pPartialTick) {
-        this.renderBackground(poseStack);
-        GuiComponent.drawString(poseStack,this.font,
+    public void render(@NotNull GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+        this.renderBackground(guiGraphics, pMouseX, pMouseY, pPartialTick);
+        guiGraphics.drawString(this.font,
                 I18n.get("damage_number:config.title"),
                 this.width / 2 - this.font.width(I18n.get("damage_number:config.title")) / 2,
                 10,
                 0xFFFFFF);
-        super.render(poseStack, pMouseX, pMouseY, pPartialTick);
-        render.render(poseStack, this.font, pPartialTick, this.width, this.height, true);
+        super.render(guiGraphics, pMouseX, pMouseY, pPartialTick);
+        render.render(guiGraphics, this.font, pPartialTick, this.width, this.height, true);
     }
 
     @Override
