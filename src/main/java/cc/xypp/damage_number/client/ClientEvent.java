@@ -69,5 +69,11 @@ public class ClientEvent {
                 Minecraft.getInstance().setScreen(new ConfigScreen());
             }
         }
+
+        @SubscribeEvent
+        public static void debug(CustomizeGuiOverlayEvent.DebugText event) {
+            if (Config.damageListShow)
+                event.getLeft().add("Last Damage Number Color Type:" + DamageTypeConfig.lastMatching);
+        }
     }
 }
