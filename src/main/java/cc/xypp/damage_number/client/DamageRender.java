@@ -130,13 +130,7 @@ public class DamageRender implements IGuiOverlay {
             }
 
             for (Pair<DamageListItem, Long> pair : Data.latest) {
-                if(pair.getLeft().shield!=-1){
-                    cc.xypp.battery_shield.data.DamageNumberType damageNumberType = cc.xypp.battery_shield.data.DamageNumberType.values()[pair.getLeft().shield];
-                    guiGraphics.drawString(font, i18n("damage_list.content",String.format("%.1f",pair.getLeft().amount)), x+20, y, cc.xypp.battery_shield.utils.ShieldUtil.getColor(damageNumberType));
-                    cc.xypp.battery_shield.utils.ShieldUtil.getIconByType(cc.xypp.battery_shield.data.DamageNumberType.values()[pair.getLeft().shield]).blit(guiGraphics,x,y);
-                }else{
-                    guiGraphics.drawString(font, i18n("damage_list.content",String.format("%.1f",pair.getLeft().amount)), x, y, 0xffffffff);
-                }
+                guiGraphics.drawString(font, i18n("damage_list.content",String.format("%.1f",pair.getLeft().amount)), x, y, (int) ((pair.getRight().getLeft()) | ((int) (Config.damageListOpacity * 255) << 24)));
                 y += lh;
             }
 

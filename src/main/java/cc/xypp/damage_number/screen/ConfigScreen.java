@@ -109,7 +109,7 @@ public class ConfigScreen extends Screen {
         while (Data.latest.size() > Config.damageListMaxSize) {
             Data.latest.remove(0);
         }
-        Data.latest.forEach((pair) -> pair.setValue(currentTime));
+        Data.latest.forEach((pair) -> pair.getRight().setValue(currentTime));
     }
 
 
