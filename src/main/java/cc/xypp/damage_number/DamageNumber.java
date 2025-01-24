@@ -20,6 +20,7 @@ import cc.xypp.damage_number.network.Network;
 public class DamageNumber
 {
     public static final String MODID = "damage_number";
+    public static final Path CONFIG_BASE_PATH = FMLPaths.CONFIGDIR.get();
     private static final Logger LOGGER = LogUtils.getLogger();
     public DamageNumber() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
