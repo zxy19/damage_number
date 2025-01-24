@@ -28,12 +28,12 @@ public class DamageRender implements LayeredDraw.Layer {
     }
 
 
-
     @Override
     public void render(GuiGraphics pGuiGraphics, DeltaTracker pDeltaTracker) {
         this.render(pGuiGraphics, Minecraft.getInstance().font, pDeltaTracker.getGameTimeDeltaPartialTick(true), pGuiGraphics.guiWidth(), pGuiGraphics.guiHeight(), false);
     }
-    public void render(GuiGraphics guiGraphics, Font font, float partialTick, int screenWidth, int screenHeight, boolean alwaysShow){
+
+    public void render(GuiGraphics guiGraphics, Font font, float partialTick, int screenWidth, int screenHeight, boolean alwaysShow) {
         if (!Config.showDamage) return;
         if (!Data.show && !alwaysShow) return;
         String titleContent = i18n("title.content");
@@ -119,11 +119,11 @@ public class DamageRender implements LayeredDraw.Layer {
             y = (int) (y / scale);
             lh = (int) (lh / scale);
             long currentTime = new Date().getTime();
-            while (Data.latest.size() > 0 && Data.latest.get(0).getRight() < currentTime - 2000) {
+            while (Data.latest.size() > 0 && Data.latest.get(0).getRight().getRight() < currentTime - 2000) {
                 Data.latest.remove(0);
             }
-            for (Pair<Float, Long> pair : Data.latest) {
-                guiGraphics.drawString(font, i18n("damage_list.content", String.format("%.1f", pair.getLeft())), x, y, (0xFFFFFF) | ((int) (Config.damageListOpacity * 255) << 24));
+            for (Pair<Float, Pair<Long, Long>> pair : Data.latest) {
+                guiGraphics.drawString(font, i18n("damage_list.content", String.format("%.1f", pair.getLeft())), x, y, (int) ((pair.getRight().getLeft()) | ((int) (Config.damageListOpacity * 255) << 24)));
                 y += lh;
             }
 
@@ -171,6 +171,7 @@ public class DamageRender implements LayeredDraw.Layer {
             guiGraphics.pose().popPose();
         }//Number Render
     }
+
     private String i18n(String s, Object... args) {
         return I18n.get(String.valueOf(ResourceLocation.fromNamespaceAndPath(DamageNumber.MODID, s)), args);
     }

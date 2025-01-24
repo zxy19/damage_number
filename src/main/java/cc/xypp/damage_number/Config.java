@@ -99,6 +99,10 @@ public class Config
     private static final ModConfigSpec.BooleanValue DAMAGE_LIST_SHOW =  BUILDER
             .translation("config.damage_number.damage_list.show")
             .define("damage_list.show", true);
+    private static final ModConfigSpec.BooleanValue DAMAGE_LIST_COLOR_TYPE =  BUILDER
+            .translation("config.damage_number.damage_list.color_type")
+            .comment("Color the damage number by damage type. Configure in damage_number_type.toml")
+            .define("damage_list.color_type", false);
 
     private static final ModConfigSpec.BooleanValue DAMAGE_RANK_USE =  BUILDER
             .comment("Use damage ranked style")
@@ -177,6 +181,7 @@ public class Config
     public static float damageListScale;
     public static float damageListOpacity;
     public static boolean damageListShow;
+    public static boolean damageListColorDamageType;
     public static int damageListMaxSize;
 
     //Damage Rank Options
@@ -232,6 +237,7 @@ public class Config
         damageListOpacity = (float) (double)DAMAGE_LIST_OPACITY.get();
         damageListMaxSize = DAMAGE_LIST_MAX_SIZE.get();
         damageListShow = DAMAGE_LIST_SHOW.get();
+        damageListColorDamageType = DAMAGE_LIST_COLOR_TYPE.get();
         damageRankEnabled = DAMAGE_RANK_USE.get();
         damageRankList = DAMAGE_RANK_OPT.get().stream().map(item->{
             String[] items = item.split("\\|");
@@ -271,6 +277,7 @@ public class Config
         DAMAGE_LIST_SCALE.set((double) damageListScale);
         DAMAGE_LIST_OPACITY.set((double) damageListOpacity);
         DAMAGE_LIST_MAX_SIZE.set(damageListMaxSize);
+        DAMAGE_LIST_COLOR_TYPE.set(damageListColorDamageType);
         DAMAGE_LIST_SHOW.set(damageListShow);
         DAMAGE_RANK_USE.set(damageRankEnabled);
         DAMAGE_RANK_OPT.set(damageRankList.stream().map(item->item.amount+"|"+item.title+"|"+String.valueOf(item.color)).collect(Collectors.toList()));

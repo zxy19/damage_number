@@ -1,18 +1,19 @@
 package cc.xypp.damage_number.client;
 
+import cc.xypp.damage_number.Config;
 import cc.xypp.damage_number.DamageNumber;
+import cc.xypp.damage_number.DamageTypeConfig;
 import cc.xypp.damage_number.screen.ConfigScreen;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.DebugScreenOverlay;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.config.ModConfigEvent;
-import net.neoforged.neoforge.client.event.InputEvent;
-import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
-import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.common.util.Lazy;
 import org.lwjgl.glfw.GLFW;
 
@@ -39,7 +40,7 @@ public class ClientEvent {
         @SubscribeEvent
         public static void RegisterGuiOverlaysEvent(RegisterGuiLayersEvent event) {
             DamageRender damageRender = new DamageRender();
-            event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(DamageNumber.MODID,"damage_number"), damageRender);
+            event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(DamageNumber.MODID, "damage_number"), damageRender);
         }
 
     }
@@ -51,6 +52,12 @@ public class ClientEvent {
             while (KEY_MAPPING_LAZY.get().consumeClick()) {
                 Minecraft.getInstance().setScreen(new ConfigScreen());
             }
+        }
+
+        @SubscribeEvent
+        public static void debug(CustomizeGuiOverlayEvent.DebugText event) {
+            if (Config.damageListShow)
+                event.getLeft().add("Last Damage Number Color Type:" + DamageTypeConfig.lastMatching);
         }
     }
 }

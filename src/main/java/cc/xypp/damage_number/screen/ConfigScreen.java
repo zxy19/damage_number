@@ -107,12 +107,12 @@ public class ConfigScreen extends Screen {
         }
         long currentTime = new Date().getTime();
         while (Data.latest.size() < Config.damageListMaxSize) {
-            Data.latest.add(new MutablePair<>(233.0f, currentTime));
+            Data.latest.add(new MutablePair<>(233.0f, new MutablePair<>(0L,currentTime)));
         }
         while (Data.latest.size() > Config.damageListMaxSize) {
             Data.latest.remove(0);
         }
-        Data.latest.forEach((pair) -> pair.setValue(currentTime));
+        Data.latest.forEach((pair) -> pair.getRight().setValue(currentTime));
     }
 
 

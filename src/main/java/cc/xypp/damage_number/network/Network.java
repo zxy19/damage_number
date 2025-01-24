@@ -28,8 +28,8 @@ public class Network {
                 Network::onClientMessage
         );
     }
-    public static void send(ServerPlayer player, String type, float amount, int combo, float instant){
-        PacketDistributor.sendToPlayer(player,new DamagePayload(type,amount,combo,instant));
+    public static void send(ServerPlayer player, String type, float amount, int combo, float instant,long color){
+        PacketDistributor.sendToPlayer(player,new DamagePayload(type,amount,combo,instant,color));
     }
     protected  static  void  onClientMessage(DamagePayload payload, IPayloadContext context){
         context.enqueueWork(()->{
@@ -37,7 +37,7 @@ public class Network {
                 Data.amount = payload.amount();
                 Data.shakes = 4;
                 Data.combo = payload.combo();
-                Data.latest.add(new MutablePair<>(payload.instant(), new Date().getTime()));
+                Data.latest.add(new MutablePair<>(payload.instant(), new MutablePair<>(payload.color(),new Date().getTime())));
                 while (Data.latest.size() != 0 && Data.latest.size() > Config.damageListMaxSize) {
                     Data.latest.remove(0);
                 }

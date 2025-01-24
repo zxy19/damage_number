@@ -8,7 +8,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
-public record DamagePayload(String t,float amount, int combo,float instant) implements CustomPacketPayload {
+public record DamagePayload(String t,float amount, int combo,float instant,long color) implements CustomPacketPayload {
     public static final CustomPacketPayload.Type<DamagePayload> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(DamageNumber.MODID, "damage"));
 
     public static final StreamCodec<ByteBuf, DamagePayload> STREAM_CODEC = StreamCodec.composite(
@@ -20,6 +20,8 @@ public record DamagePayload(String t,float amount, int combo,float instant) impl
             DamagePayload::combo,
             ByteBufCodecs.FLOAT,
             DamagePayload::instant,
+            ByteBufCodecs.VAR_LONG,
+            DamagePayload::color,
             DamagePayload::new
     );
 

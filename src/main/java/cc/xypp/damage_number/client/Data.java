@@ -13,6 +13,6 @@ public class Data {
     public static boolean show = false;
     public static int shakes = 3;
     public static boolean confirm = true;
-    public static List<Pair<Float,Long>> latest = new ArrayList<>();
+    public static List<Pair<Float,Pair<Long,Long>>> latest = new ArrayList<>();
     public static int combo = 0;
 }
