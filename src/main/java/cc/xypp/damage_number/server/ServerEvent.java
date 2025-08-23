@@ -1,29 +1,23 @@
 package cc.xypp.damage_number.server;
 
+import cc.xypp.damage_number.Config;
 import cc.xypp.damage_number.DamageNumber;
 import cc.xypp.damage_number.DamageTypeConfig;
 import cc.xypp.damage_number.network.Network;
-import net.minecraft.client.Minecraft;
+import net.minecraft.commands.Commands;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.tags.DamageTypeTags;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageType;
-import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.config.ModConfigEvent;
-import net.neoforged.neoforge.common.Tags;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
-import net.neoforged.neoforge.registries.RegisterEvent;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -61,7 +55,7 @@ public class ServerEvent {
                 String uid = entity.getUUID().toString();
                 damageCount.put(uid, damageCount.getOrDefault(uid, 0) + 1);
                 userDamage.put(uid, event.getNewDamage() + userDamage.getOrDefault(uid, 0.0f));
-                keepUntil.put(uid, new Date().getTime() + 3000);
+                keepUntil.put(uid, new Date().getTime() + Config.clearTime);
                 Network.send((ServerPlayer) entity,
                         "emit",
                         userDamage.get(uid),
@@ -86,6 +80,22 @@ public class ServerEvent {
                 DamageTypeConfig.addGroup(type.msgId());
             }
             DamageTypeConfig.register();
+        }
+
+        @SubscribeEvent
+        public static void onRegisterCommand(RegisterCommandsEvent event) {
+            event.getDispatcher().register(
+                    Commands.literal("damage_number")
+                            .then(Commands.literal("clear")
+                                    .executes(t -> {
+                                        ServerPlayer player = t.getSource().getPlayerOrException();
+                                        if (keepUntil.containsKey(player.getUUID().toString())) {
+                                            keepUntil.put(player.getUUID().toString(), new Date().getTime());
+                                            return 0;
+                                        }
+                                        return 1;
+                                    }))
+            );
         }
     }
 }
