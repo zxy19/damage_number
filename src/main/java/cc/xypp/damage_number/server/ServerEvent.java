@@ -67,13 +67,15 @@ public class ServerEvent {
                     }
                 }
                 damageCount.put(uid, damageCount.getOrDefault(uid, 0) + 1);
-                userDamage.put(uid,  amount+ userDamage.getOrDefault(uid, 0.0f));
+                userDamage.put(uid, event.getNewDamage() + userDamage.getOrDefault(uid, 0.0f));
                 keepUntil.put(uid, new Date().getTime() + 3000);
-                Network.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) entity),
-                        new DamagePackage("emit",
-                                userDamage.get(uid),
-                                damageCount.get(uid),
-                                amount,shield));
+                Network.send((ServerPlayer) entity,
+                        "emit",
+                        userDamage.get(uid),
+                        damageCount.get(uid),
+                        event.getNewDamage(),
+                        DamageTypeConfig.getColorForDamageType(event.getSource())
+                );
             }
         }
 
