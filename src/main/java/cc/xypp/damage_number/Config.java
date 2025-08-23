@@ -33,6 +33,13 @@ public class Config
     private static final ForgeConfigSpec.BooleanValue SHOW_DAMAGE = BUILDER
             .translation("config.damage_number.show")
             .define("show", true);
+    private static final ForgeConfigSpec.BooleanValue NO_SHAKE = BUILDER
+            .translation("config.damage_number.no_shake")
+            .define("no_shake", false);
+    private static final ForgeConfigSpec.IntValue CLEAR_TIME = BUILDER
+            .translation("config.damage_number.clear_time")
+            .comment("How long will the damage accumulation being cleared. This option is decided by server.")
+            .defineInRange("clear_time", 3000, 0, Integer.MAX_VALUE);
 
     private static final ForgeConfigSpec.ConfigValue<Integer> NUMBER_X =  BUILDER
             .translation("config.damage_number.number.x")
@@ -154,7 +161,10 @@ public class Config
 
     static final ForgeConfigSpec SPEC = BUILDER.build();
 
+    //misc
     public static boolean showDamage;
+    public static boolean noShake;
+    public static int clearTime;
     //Damage Number Options
     public static int numberX;
     public static int numberY;
@@ -217,6 +227,8 @@ public class Config
     static void onLoad(final ModConfigEvent event)
     {
         showDamage = SHOW_DAMAGE.get();
+        noShake = NO_SHAKE.get();
+        clearTime = CLEAR_TIME.get();
         numberX = NUMBER_X.get();
         numberY = NUMBER_Y.get();
         numberScale = (float) (double)NUMBER_SCALE.get();
@@ -258,6 +270,8 @@ public class Config
     }
     public static void save(){
         SHOW_DAMAGE.set(showDamage);
+        NO_SHAKE.set(noShake);
+        CLEAR_TIME.set(clearTime);
         NUMBER_X.set(numberX);
         NUMBER_Y.set(numberY);
         NUMBER_SCALE.set((double) numberScale);

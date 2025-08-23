@@ -29,7 +29,7 @@ public class Network {
         context.enqueueWork(()->{
             if (Objects.equals(payload.t(), "emit")) {
                 Data.amount = payload.amount();
-                Data.shakes = 4;
+                if(!Config.noShake) Data.shakes = 4;
                 Data.combo = payload.combo();
                 Data.latest.add(new MutablePair<>(payload.instant(), new MutablePair<>(payload.color(),new Date().getTime())));
                 while (Data.latest.size() != 0 && Data.latest.size() > Config.damageListMaxSize) {
