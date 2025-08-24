@@ -1,43 +1,47 @@
 package cc.xypp.damage_number;
 
 
+import cc.xypp.damage_number.api.decoration.INumberDecoration;
+import cc.xypp.damage_number.api.decoration.IconDecoration;
+import cc.xypp.damage_number.api.decoration.ItemDecoration;
 import cc.xypp.damage_number.utils.Colors;
 import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
 import com.electronwill.nightconfig.toml.TomlFormat;
 import com.electronwill.nightconfig.toml.TomlParser;
 import com.electronwill.nightconfig.toml.TomlWriter;
-import net.minecraft.core.Holder;
-import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
+import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
-import net.neoforged.neoforge.common.ModConfigSpec;
-import net.neoforged.neoforge.common.Tags;
+import oshi.util.tuples.Pair;
 
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.nio.file.Path;
 import java.util.*;
 
 
 @EventBusSubscriber(modid = DamageNumber.MODID, bus = EventBusSubscriber.Bus.MOD)
 public class DamageTypeConfig {
+    record StyleRecord(String color, ResourceLocation itemStack, ResourceLocation icon) {
+    }
+
     static CommentedConfig config;
-    public static Map<String, Integer> typePriority = new HashMap<>();
-    public static Map<String, Integer> tagPriority = new HashMap<>();
-    public static Map<String, String> typeStyle = new HashMap<>();
-    public static Map<String, String> tagStyle = new HashMap<>();
-    public static Set<String> typeList = new HashSet<>();
-    public static Set<String> tagList = new HashSet<>();
-    public static boolean randomColorForTag = false;
-    public static boolean randomColorForType = false;
+    static Map<String, Integer> typePriority = new HashMap<>();
+    static Map<String, Integer> tagPriority = new HashMap<>();
+    static Map<String, StyleRecord> typeStyle = new HashMap<>();
+    static Map<String, StyleRecord> tagStyle = new HashMap<>();
+    static Set<String> typeList = new HashSet<>();
+    static Set<String> tagList = new HashSet<>();
+    static boolean randomColorForTag = false;
+    static boolean randomColorForType = false;
     public static String lastMatching = "null";
+
     public static void addGroup(String id) {
         typeList.add(id);
     }
@@ -78,54 +82,60 @@ public class DamageTypeConfig {
         randomColorForType = config.getOrElse("sys.randomColorForType", false);
 
         for (String id : typeList) {
-            if (!config.contains("type." + id + ".color")) {
-                if (randomColorForType)
-                    config.set("type." + id + ".color", String.valueOf(Colors.randomColor()));
-                else
-                    config.set("type." + id + ".color", "[NO-VALUE]");
-
-                config.setComment(
-                        "type." + id + ".color",
-                        "Color of the damage number. [NO-VALUE] to use default color."
-                );
-                change = true;
-            }
-            if (!config.contains("type." + id + ".priority")) {
-                config.add("type." + id + ".priority", 0);
-                change = true;
-            }
-
-            typeStyle.put(id, config.get("type." + id + ".color"));
-            typePriority.put(id, config.getIntOrElse("type." + id + ".priority", 0));
+            change |= loadFor(typeStyle, typePriority, "type", id);
         }
 
         for (String id : tagList) {
-            if (!config.contains("tag." + id + ".color")) {
-                if (randomColorForTag)
-                    config.set("tag." + id + ".color", String.valueOf(Colors.randomColor()));
-                else
-                    config.set("tag." + id + ".color", "[NO-VALUE]");
+            change |= loadFor(tagStyle, tagPriority, "tag", id);
+        }
 
-                config.setComment(
-                        "tag." + id + ".color",
-                        "Color of the damage number. [NO-VALUE] to use default color."
-                );
-                change = true;
-            }
-            if (!config.contains("tag." + id + ".priority")) {
-                if (id.equals("minecraft:is_player_attack"))
-                    config.set("tag." + id + ".priority", -1);
-                else
-                    config.set("tag." + id + ".priority", 0);
-                change = true;
-            }
+        if (change) save();
+    }
 
-            tagStyle.put(id, config.get("tag." + id + ".color"));
-            tagPriority.put(id, config.getIntOrElse("tag." + id + ".priority", 0));
+    private static boolean loadFor(Map<String, StyleRecord> target, Map<String, Integer> priority, String category, String id) {
+        String prefix = category + "." + id;
+        boolean change = false;
+        if (!config.contains(prefix + ".color")) {
+            if (randomColorForTag)
+                config.set(prefix + ".color", String.valueOf(Colors.randomColor()));
+            else
+                config.set(prefix + ".color", "[NO-VALUE]");
+
+            config.setComment(
+                    prefix + ".color",
+                    "Color of the damage number. [NO-VALUE] to use default color."
+            );
+            change = true;
+        }
+        if (!config.contains(prefix + ".priority")) {
+            if (id.equals("minecraft:is_player_attack"))
+                config.set(prefix + ".priority", -1);
+            else
+                config.set(prefix + ".priority", 0);
+            change = true;
+        }
+        if (!config.contains(prefix + ".icon.tex")) {
+            config.set(prefix + ".icon.tex", "");
+            change = true;
+        }
+        if (!config.contains(prefix + ".icon.item")) {
+            config.set(prefix + ".icon.item", "");
+            change = true;
         }
 
 
-        if (change) save();
+        String color = config.get(prefix + ".color");
+        String iconTex = config.get(prefix + ".icon.tex");
+        String iconItem = config.get(prefix + ".icon.item");
+
+
+        target.put(id, new StyleRecord(
+                color,
+                iconItem.isEmpty() ? null : ResourceLocation.tryParse(iconItem),
+                iconTex.isEmpty() ? null : ResourceLocation.tryParse(iconTex)
+        ));
+        priority.put(id, config.getIntOrElse(prefix + ".priority", 0));
+        return change;
     }
 
     public static void save() {
@@ -151,11 +161,11 @@ public class DamageTypeConfig {
             if (
                     typePriority.get(damageSource.type().msgId()) >= maxPriority
                             &&
-                            !typeStyle.get(damageSource.type().msgId()).equals("[NO-VALUE]")
+                            !typeStyle.get(damageSource.type().msgId()).color().equals("[NO-VALUE]")
             ) {
                 maxPriority = typePriority.get(damageSource.type().msgId());
-                color = Colors.toColor(typeStyle.get(damageSource.type().msgId()));
-                matching = "ID:"+damageSource.type().msgId();
+                color = Colors.toColor(typeStyle.get(damageSource.type().msgId()).color());
+                matching = "ID:" + damageSource.type().msgId();
             }
         }
 
@@ -165,17 +175,50 @@ public class DamageTypeConfig {
                     if (
                             tagPriority.get(tag.location().toString()) >= maxPriority
                                     &&
-                                    !tagStyle.get(tag.location().toString()).equals("[NO-VALUE]")
+                                    !tagStyle.get(tag.location().toString()).color().equals("[NO-VALUE]")
                     ) {
                         maxPriority = tagPriority.get(tag.location().toString());
-                        color = Colors.toColor(tagStyle.get(tag.location().toString()));
-                        matching = "TAG:"+tag.location().toString();
+                        color = Colors.toColor(tagStyle.get(tag.location().toString()).color());
+                        matching = "TAG:" + tag.location().toString();
                     }
                 }
             }
         }
         lastMatching = matching;
         return color;
+    }
+
+    public static List<INumberDecoration> getDecorationsForDamageType(DamageSource damageSource) {
+        List<Pair<Integer, INumberDecoration>> decorations = new ArrayList<>();
+        if (typePriority.containsKey(damageSource.type().msgId())) {
+            addDecoration(damageSource.type().msgId(), decorations, typeStyle);
+        }
+        for (TagKey<DamageType> tag : damageSource.typeHolder().tags().toList()) {
+            if (tagPriority.containsKey(tag.location().toString())) {
+                if (damageSource.is(tag)) {
+                    addDecoration(tag.location().toString(), decorations, tagStyle);
+                }
+            }
+        }
+        return decorations.stream().sorted(Comparator.comparingInt(Pair::getA)).map(Pair::getB).toList();
+    }
+
+    private static void addDecoration(String id, List<Pair<Integer, INumberDecoration>> decorations, Map<String, StyleRecord> styleRecordMap) {
+        if (!styleRecordMap.containsKey(id))
+            return;
+        if (styleRecordMap.get(id).icon() != null) {
+            decorations.add(new Pair<>(
+                    typePriority.get(id),
+                    new IconDecoration(styleRecordMap.get(id).icon(), 0, 0, 64, 64, 64, 64)
+            ));
+        }
+        if (styleRecordMap.get(id).itemStack() != null) {
+            Optional<Item> item = BuiltInRegistries.ITEM.getOptional(styleRecordMap.get(id).itemStack());
+            item.ifPresent(value -> decorations.add(new Pair<>(
+                    typePriority.get(id),
+                    new ItemDecoration(value.getDefaultInstance())
+            )));
+        }
     }
 
     @SubscribeEvent

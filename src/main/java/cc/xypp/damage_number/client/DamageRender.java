@@ -15,6 +15,7 @@ import net.minecraftforge.fml.ModList;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Date;
+import java.util.List;
 
 public class DamageRender implements IGuiOverlay {
     private long shakeDiff = 0;
@@ -28,6 +29,17 @@ public class DamageRender implements IGuiOverlay {
         }
     }
 
+    private static final Map<ResourceLocation, INumberDecorationRenderer<?>> renderers = Map.of(
+            IconDecoration.ID, new IconDecorationRenderer(),
+            ItemDecoration.ID, new ItemDecorationRenderer()
+    );
+
+
+    @SuppressWarnings("unchecked")
+    private <T extends INumberDecoration> INumberDecorationRenderer<T> getDecorationRenderer(T decoration) {
+        ResourceLocation id = decoration.getId();
+        return (INumberDecorationRenderer<T>) renderers.get(id);
+    }
 
     private String i18n(String s, Object... args) {
         return I18n.get(String.valueOf(new ResourceLocation(DamageNumber.MODID, s)), args);
@@ -89,7 +101,8 @@ public class DamageRender implements IGuiOverlay {
             }
         }//RANK OPT
 
-        if(Config.titleShow){//TITLE Render
+
+        if (Config.titleShow) {//TITLE Render
             float scale = (float) Config.titleScale;
             guiGraphics.pose().pushPose();
             guiGraphics.pose().scale(scale, scale, scale);
@@ -129,8 +142,18 @@ public class DamageRender implements IGuiOverlay {
                 Data.latest.remove(0);
             }
 
-            for (Pair<DamageListItem, Long> pair : Data.latest) {
-                guiGraphics.drawString(font, i18n("damage_list.content",String.format("%.1f",pair.getLeft().amount)), x, y, (int) ((pair.getRight().getLeft()) | ((int) (Config.damageListOpacity * 255) << 24)));
+            for (Pair<Long, DamageRecord> recordTime : Data.latest) {
+                DamageRecord record = recordTime.getB();
+                Component component = record.displayFormat().getFinal(String.format("%.1f", record.amount()));
+                guiGraphics.drawString(font,
+                        component,
+                        x,
+                        y,
+                        (int) ((record.color()) | ((int) (Config.damageListOpacity * 255) << 24)));
+                renderAllDecorations(record.decorations(),
+                        guiGraphics,
+                        x + font.width(component),
+                        y);
                 y += lh;
             }
 
@@ -179,5 +202,20 @@ public class DamageRender implements IGuiOverlay {
             guiGraphics.pose().popPose();
         }//Number Render
         guiGraphics.setColor(1,1,1,1);
+    }
+
+    private void renderAllDecorations(List<INumberDecoration> decorations, GuiGraphics guiGraphics, int x, int y) {
+        for (int i = 0; i < decorations.size(); i++) {
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().translate(x + i * 8, y, 0);
+            guiGraphics.pose().scale(0.5f, 0.5f, 0);
+            INumberDecorationRenderer<INumberDecoration> decorationRenderer = getDecorationRenderer(decorations.get(i));
+            decorationRenderer.render(guiGraphics, decorations.get(i), 1);
+            guiGraphics.pose().popPose();
+        }
+    }
+
+    private String i18n(String s, Object... args) {
+        return I18n.get(String.valueOf(ResourceLocation.fromNamespaceAndPath(DamageNumber.MODID, s)), args);
     }
 }
