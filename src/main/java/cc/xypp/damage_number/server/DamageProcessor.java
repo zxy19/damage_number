@@ -24,16 +24,20 @@ public class DamageProcessor {
     public static void process(ServerPlayer serverPlayer, DamageSource source, float newDamage) {
         long defaultColor = DamageTypeConfig.getColorForDamageType(source);
         List<INumberDecoration> decorations = DamageTypeConfig.getDecorationsForDamageType(source);
-
+        DamageTextFmt textFormat = DamageTypeConfig.getTextFmtForDamageType(source);
         String uid = serverPlayer.getUUID().toString();
 
+        process(serverPlayer, source, newDamage, uid, (int) defaultColor, decorations, textFormat);
+    }
+
+    public static void process(ServerPlayer serverPlayer, DamageSource source, float newDamage, String uid, int defaultColor, List<INumberDecoration> decorations, DamageTextFmt textFormat) {
         DamageEmitEvent event = new DamageEmitEvent(
                 newDamage + userDamage.getOrDefault(uid, 0.0f),
                 newDamage,
                 damageCount.getOrDefault(uid, 0) + 1,
-                (int) defaultColor,
+                defaultColor,
                 decorations,
-                DamageTextFmt.getDefault(),
+                textFormat,
                 source,
                 serverPlayer
         );
@@ -82,5 +86,13 @@ public class DamageProcessor {
                 userDamage.remove(uuid);
             }
         }
+    }
+
+    public static float getAmount(ServerPlayer serverPlayer) {
+        return userDamage.getOrDefault(serverPlayer.getUUID().toString(), 0.0f);
+    }
+
+    public static float getCombo(ServerPlayer serverPlayer) {
+        return damageCount.getOrDefault(serverPlayer.getUUID().toString(), 0);
     }
 }

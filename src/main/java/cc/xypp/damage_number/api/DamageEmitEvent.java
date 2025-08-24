@@ -19,6 +19,18 @@ public class DamageEmitEvent extends Event {
     protected List<INumberDecoration> decorations;
     protected @NotNull DamageTextFmt textFormat;
 
+    /**
+     * 伤害触发事件。会在伤害数字被记录之前触发
+     *
+     * @param amount      目前已记录的伤害总数（包含本次）
+     * @param instant     本次伤害
+     * @param combo       目前已记录的连击数（包含本次）
+     * @param color       颜色
+     * @param decorations 伤害装饰标志（显示在右侧）
+     * @param textFormat  伤害数字格式
+     * @param source      伤害来源
+     * @param player      玩家
+     */
     public DamageEmitEvent(float amount,
                            float instant,
                            int combo,
