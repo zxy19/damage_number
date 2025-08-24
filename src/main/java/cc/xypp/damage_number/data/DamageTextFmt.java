@@ -1,9 +1,8 @@
 package cc.xypp.damage_number.data;
 
 
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.ComponentSerialization;
 
 public class DamageTextFmt {
     public static final DamageTextFmt DEFAULT_TEXT_FMT = new DamageTextFmt("damage_list.content", Component.empty(), Component.empty());
@@ -21,18 +20,18 @@ public class DamageTextFmt {
         return new DamageTextFmt("damage_list.content", Component.empty(), Component.empty());
     }
 
-    public static DamageTextFmt fromNetwork(RegistryFriendlyByteBuf buf) {
+    public static DamageTextFmt fromNetwork(FriendlyByteBuf buf) {
         return new DamageTextFmt(
                 buf.readUtf(),
-                buf.readJsonWithCodec(ComponentSerialization.CODEC),
-                buf.readJsonWithCodec(ComponentSerialization.CODEC)
+                buf.readComponent(),
+                buf.readComponent()
         );
     }
 
-    public void toNetwork(RegistryFriendlyByteBuf buf) {
+    public void toNetwork(FriendlyByteBuf buf) {
         buf.writeUtf(formatKey);
-        buf.writeJsonWithCodec(ComponentSerialization.CODEC, prepend);
-        buf.writeJsonWithCodec(ComponentSerialization.CODEC, append);
+        buf.writeComponent(prepend);
+        buf.writeComponent(append);
     }
 
     public void append(Component component) {

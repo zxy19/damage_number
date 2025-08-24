@@ -1,6 +1,6 @@
 package cc.xypp.damage_number.api.decoration;
 
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Map;
@@ -11,13 +11,13 @@ public class DecorationSerializer {
             ItemDecoration.ID, ItemDecoration::new
     );
 
-    public static INumberDecoration fromNetwork(RegistryFriendlyByteBuf buf) {
+    public static INumberDecoration fromNetwork(FriendlyByteBuf buf) {
         var decoration = types.get(buf.readResourceLocation());
         if (decoration == null) return null;
         return decoration.build(buf);
     }
 
-    public static void toNetwork(RegistryFriendlyByteBuf buf, INumberDecoration decoration) {
+    public static void toNetwork(FriendlyByteBuf buf, INumberDecoration decoration) {
         buf.writeResourceLocation(decoration.getId());
         decoration.writeToNetwork(buf);
     }

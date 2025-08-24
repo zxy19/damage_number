@@ -20,20 +20,15 @@ import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
-import net.minecraftforge.network.PacketDistributor;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 public class ServerEvent {
-    @Mod.EventBusSubscriber(modid = DamageNumber.MODID,bus = Mod.EventBusSubscriber.Bus.FORGE)
+    @Mod.EventBusSubscriber(modid = DamageNumber.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
     public static class FORGE {
         @SubscribeEvent
         public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
-            if (!(event.getEntity() instanceof ServerPlayer serverPlayer)) return;
+            if (!(event.player instanceof ServerPlayer serverPlayer)) return;
             DamageProcessor.checkPlayerDamageTick(serverPlayer);
         }
 
@@ -41,8 +36,7 @@ public class ServerEvent {
         public static void onDamagePost(LivingDamageEvent event) {
             Entity entity = event.getSource().getEntity();
             if (entity instanceof ServerPlayer serverPlayer) {
-                DamageProcessor.process(serverPlayer, event.getSource(), event.getNewDamage());
-
+                DamageProcessor.process(serverPlayer, event.getSource(), event.getAmount());
             }
         }
 

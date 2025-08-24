@@ -1,28 +1,30 @@
 package cc.xypp.damage_number.screen;
 
 import cc.xypp.damage_number.Config;
-import cc.xypp.damage_number.DamageNumber;
+import cc.xypp.damage_number.api.decoration.IconDecoration;
+import cc.xypp.damage_number.api.decoration.ItemDecoration;
 import cc.xypp.damage_number.client.DamageRender;
 import cc.xypp.damage_number.client.Data;
-import cc.xypp.damage_number.widget.GridLayout;
-import cc.xypp.damage_number.widget.StringWidget;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
+import net.minecraft.client.gui.layouts.GridLayout;
+import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
+import oshi.util.tuples.Pair;
 
-import javax.swing.*;
 import java.util.Date;
+import java.util.List;
 
 @OnlyIn(Dist.CLIENT)
 public class ConfigScreen extends Screen {
@@ -38,7 +40,7 @@ public class ConfigScreen extends Screen {
             DamageTextFmt.DEFAULT_TEXT_FMT,
             List.of(
                     new IconDecoration(
-                            ResourceLocation.fromNamespaceAndPath("minecraft", "textures/block/barrel_top.png"),
+                            new ResourceLocation("minecraft", "textures/block/barrel_top.png"),
                             0, 0,
                             16, 16,
                             16, 16
@@ -55,7 +57,7 @@ public class ConfigScreen extends Screen {
             DamageTextFmt.DEFAULT_TEXT_FMT,
             List.of(
                     new IconDecoration(
-                            ResourceLocation.fromNamespaceAndPath("minecraft", "textures/block/barrel_top.png"),
+                            new ResourceLocation("minecraft", "textures/block/barrel_top.png"),
                             0, 0,
                             16, 16,
                             16, 16

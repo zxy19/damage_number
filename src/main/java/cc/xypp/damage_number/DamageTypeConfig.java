@@ -18,9 +18,9 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.item.Item;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.config.ModConfigEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
 import oshi.util.tuples.Pair;
 
 import java.io.FileReader;
@@ -28,7 +28,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 
-@EventBusSubscriber(modid = DamageNumber.MODID, bus = EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid = DamageNumber.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class DamageTypeConfig {
     record StyleRecord(String color, ResourceLocation itemStack, ResourceLocation icon, String prependKey,
                        String appendKey, String formatKey) {

@@ -2,6 +2,7 @@ package cc.xypp.damage_number.client;
 
 import cc.xypp.damage_number.Config;
 import cc.xypp.damage_number.DamageNumber;
+import cc.xypp.damage_number.data.DamageListItem;
 import cc.xypp.damage_number.network.DamagePackage;
 import cc.xypp.damage_number.network.Network;
 import cc.xypp.damage_number.screen.ConfigScreen;
@@ -9,6 +10,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.CustomizeGuiOverlayEvent;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
@@ -19,6 +21,7 @@ import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.lwjgl.glfw.GLFW;
+import oshi.util.tuples.Pair;
 
 import java.util.Date;
 import java.util.Objects;
@@ -44,7 +47,7 @@ public class ClientEvent {
                             Data.amount = msg.amount;
                             Data.shakes = 4;
                             Data.combo = msg.combo;
-                            Data.latest.add(new MutablePair<>(msg.instant, new Date().getTime()));
+                            Data.latest.add(new Pair<>(new Date().getTime(), msg.data));
                             while (Data.latest.size() != 0 && Data.latest.size() > Config.damageListMaxSize) {
                                 Data.latest.remove(0);
                             }
