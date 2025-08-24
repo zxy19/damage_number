@@ -32,6 +32,40 @@ public class ConfigScreen extends Screen {
     private static final int CONFIG_PANE_WIDTH = 140;
     private static final int TITLE_HEIGHT = 40;
 
+    private static final DamageRecord TEST = new DamageRecord(
+            233.0f,
+            0xffffffff,
+            DamageTextFmt.DEFAULT_TEXT_FMT,
+            List.of(
+                    new IconDecoration(
+                            ResourceLocation.fromNamespaceAndPath("minecraft", "textures/block/barrel_top.png"),
+                            0, 0,
+                            16, 16,
+                            16, 16
+                    ),
+                    new ItemDecoration(
+                            Items.REDSTONE_BLOCK.getDefaultInstance()
+                    )
+            )
+    );
+
+    private static final DamageRecord TESTB = new DamageRecord(
+            233.0f,
+            0xff80e625,
+            DamageTextFmt.DEFAULT_TEXT_FMT,
+            List.of(
+                    new IconDecoration(
+                            ResourceLocation.fromNamespaceAndPath("minecraft", "textures/block/barrel_top.png"),
+                            0, 0,
+                            16, 16,
+                            16, 16
+                    ),
+                    new ItemDecoration(
+                            Items.REDSTONE_BLOCK.getDefaultInstance()
+                    )
+            )
+    );
+
     private final DamageRender render;
     private GridLayout layout;
     private CycleButton<Component> selectKey;
@@ -106,13 +140,13 @@ public class ConfigScreen extends Screen {
             readValues(currentKey);
         }
         long currentTime = new Date().getTime();
+        Data.latest.clear();
         while (Data.latest.size() < Config.damageListMaxSize) {
-            Data.latest.add(new MutablePair<>(233.0f, currentTime));
+            if (Data.latest.size() % 2 == 0)
+                Data.latest.add(new Pair<>(currentTime, TEST));
+            else
+                Data.latest.add(new Pair<>(currentTime, TESTB));
         }
-        while (Data.latest.size() > Config.damageListMaxSize) {
-            Data.latest.remove(0);
-        }
-        Data.latest.forEach((pair) -> pair.getRight().setValue(currentTime));
     }
 
 

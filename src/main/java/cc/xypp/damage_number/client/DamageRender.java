@@ -27,6 +27,23 @@ public class DamageRender implements IGuiOverlay {
         }
     }
 
+    private static final Map<ResourceLocation, INumberDecorationRenderer<?>> renderers = Map.of(
+            IconDecoration.ID, new IconDecorationRenderer(),
+            ItemDecoration.ID, new ItemDecorationRenderer()
+    );
+
+
+    @SuppressWarnings("unchecked")
+    private <T extends INumberDecoration> INumberDecorationRenderer<T> getDecorationRenderer(T decoration) {
+        ResourceLocation id = decoration.getId();
+        return (INumberDecorationRenderer<T>) renderers.get(id);
+    }
+
+    private String i18n(String s, Object... args) {
+        return I18n.get(String.valueOf(new ResourceLocation(DamageNumber.MODID, s)), args);
+    }
+
+
     @Override
     public void render(ForgeGui gui, PoseStack poseStack, float partialTick, int screenWidth, int screenHeight) {
         this.render(poseStack, gui.getFont(), partialTick, screenWidth, screenHeight,false);
@@ -121,8 +138,19 @@ public class DamageRender implements IGuiOverlay {
             while (Data.latest.size() > 0 && Data.latest.get(0).getRight() < currentTime - 2000) {
                 Data.latest.remove(0);
             }
-            for (Pair<Float, Long> pair : Data.latest) {
-                GuiComponent.drawString(poseStack, font, i18n("damage_list.content", String.format("%.1f", pair.getLeft())), x, y, (0xFFFFFF) | ((int) (Config.damageListOpacity * 255) << 24));
+
+            for (Pair<Long, DamageRecord> recordTime : Data.latest) {
+                DamageRecord record = recordTime.getB();
+                Component component = record.displayFormat().getFinal(String.format("%.1f", record.amount()));
+                GuiComponent.drawString(poseStack, font,
+                        component,
+                        x,
+                        y,
+                        (int) ((record.color()) | ((int) (Config.damageListOpacity * 255) << 24)));
+                renderAllDecorations(record.decorations(),
+                        poseStack,
+                        x + font.width(component),
+                        y);
                 y += lh;
             }
 
@@ -172,5 +200,20 @@ public class DamageRender implements IGuiOverlay {
     }
     private String i18n(String s, Object... args) {
         return I18n.get(String.valueOf(new ResourceLocation(DamageNumber.MODID, s)), args);
+    }
+
+    private void renderAllDecorations(List<INumberDecoration> decorations, PoseStack poseStack, int x, int y) {
+        for (int i = 0; i < decorations.size(); i++) {
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().translate(x + i * 8, y, 0);
+            guiGraphics.pose().scale(0.5f, 0.5f, 0);
+            INumberDecorationRenderer<INumberDecoration> decorationRenderer = getDecorationRenderer(decorations.get(i));
+            decorationRenderer.render(guiGraphics, decorations.get(i), 1);
+            guiGraphics.pose().popPose();
+        }
+    }
+
+    private String i18n(String s, Object... args) {
+        return I18n.get(String.valueOf(ResourceLocation.fromNamespaceAndPath(DamageNumber.MODID, s)), args);
     }
 }
