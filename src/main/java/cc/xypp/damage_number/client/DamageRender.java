@@ -135,7 +135,7 @@ public class DamageRender implements IIngameOverlay {
             y = (int) (y / scale);
             lh = (int) (lh / scale);
             long currentTime = new Date().getTime();
-            while (Data.latest.size() > 0 && Data.latest.get(0).getRight() < currentTime - 2000) {
+            while (Data.latest.size()>0 && Data.latest.get(0).getRight() < currentTime - Config.damageListClearTime) {
                 Data.latest.remove(0);
             }
 

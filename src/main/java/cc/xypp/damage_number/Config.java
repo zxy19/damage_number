@@ -111,6 +111,10 @@ public class Config
             .translation("config.damage_number.damage_list.color_type")
             .comment("Color the damage number by damage type. Configure in damage_number_type.toml")
             .define("damage_list.color_type", false);
+    private static final ModConfigSpec.IntValue DAMAGE_LIST_CLEAR_TIME = BUILDER
+            .translation("config.damage_number.damage_list.clear_time")
+            .comment("How long will number in list disappears")
+            .defineInRange("damage_list.clear_time", 2000, 0, Integer.MAX_VALUE);
 
     private static final ForgeConfigSpec.BooleanValue DAMAGE_RANK_USE =  BUILDER
             .comment("Use damage ranked style")
@@ -194,6 +198,7 @@ public class Config
     public static boolean damageListShow;
     public static boolean damageListColorDamageType;
     public static int damageListMaxSize;
+    public static int damageListClearTime;
 
     //Damage Rank Options
     public static List<RankOptionItem> damageRankList = new ArrayList<>();
@@ -251,6 +256,7 @@ public class Config
         damageListMaxSize = DAMAGE_LIST_MAX_SIZE.get();
         damageListShow = DAMAGE_LIST_SHOW.get();
         damageListColorDamageType = DAMAGE_LIST_COLOR_TYPE.get();
+        damageListClearTime = DAMAGE_LIST_CLEAR_TIME.get();
         damageRankEnabled = DAMAGE_RANK_USE.get();
         damageRankList = DAMAGE_RANK_OPT.get().stream().map(item->{
             String[] items = item.split("\\|");
@@ -294,6 +300,7 @@ public class Config
         DAMAGE_LIST_MAX_SIZE.set(damageListMaxSize);
         DAMAGE_LIST_COLOR_TYPE.set(damageListColorDamageType);
         DAMAGE_LIST_SHOW.set(damageListShow);
+        DAMAGE_LIST_CLEAR_TIME.set(damageListClearTime);
         DAMAGE_RANK_USE.set(damageRankEnabled);
         DAMAGE_RANK_OPT.set(damageRankList.stream().map(item->item.amount+"|"+item.title+"|"+String.valueOf(item.color)).collect(Collectors.toList()));
         DAMAGE_RANK_COLOR_NUMBER.set(damageRankColorDamageNumber);
