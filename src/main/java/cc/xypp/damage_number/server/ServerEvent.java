@@ -1,8 +1,12 @@
 package cc.xypp.damage_number.server;
 
 import cc.xypp.damage_number.DamageNumber;
-import cc.xypp.damage_number.network.DamagePackage;
+import cc.xypp.damage_number.DamageTypeConfig;
 import cc.xypp.damage_number.network.Network;
+import net.minecraft.commands.Commands;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.tags.TagKey;
@@ -25,46 +29,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ServerEvent {
-    static Map<String, Float> userDamage = new HashMap<>();
-    static Map<String, Long> keepUntil = new HashMap<>();
-    static Map<String, Integer> damageCount = new HashMap<>();
     @Mod.EventBusSubscriber(modid = DamageNumber.MODID,bus = Mod.EventBusSubscriber.Bus.FORGE)
     public static class FORGE {
         @SubscribeEvent
         public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
-            if (event.side != LogicalSide.SERVER) return;
-            if (event.phase == TickEvent.Phase.START) {
-                String uuid = event.player.getUUID().toString();
-                if (keepUntil.containsKey(uuid)) {
-                    if (keepUntil.get(uuid) < new Date().getTime()) {
-                        Network.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) event.player),
-                                new DamagePackage("total",
-                                        userDamage.get(uuid),
-                                        damageCount.get(uuid),
-                                        0.0f));
-                        keepUntil.remove(uuid);
-                        damageCount.remove(uuid);
-                        userDamage.remove(uuid);
-                    }
-                }
-            }
+            if (!(event.getEntity() instanceof ServerPlayer serverPlayer)) return;
+            DamageProcessor.checkPlayerDamageTick(serverPlayer);
         }
 
         @SubscribeEvent(priority = EventPriority.LOWEST)
         public static void onDamagePost(LivingDamageEvent event) {
             Entity entity = event.getSource().getEntity();
-            if (entity != null && entity.getType() == net.minecraft.world.entity.EntityType.PLAYER) {
-                String uid = entity.getUUID().toString();
-                damageCount.put(uid, damageCount.getOrDefault(uid, 0) + 1);
-                userDamage.put(uid, event.getAmount() + userDamage.getOrDefault(uid, 0.0f));
-                keepUntil.put(uid, new Date().getTime() + 3000);
-                Network.send((ServerPlayer) entity,
-                        "emit",
-                        userDamage.get(uid),
-                        damageCount.get(uid),
-                        event.getNewDamage(),
-                        DamageTypeConfig.getColorForDamageType(event.getSource())
-                );
+            if (entity instanceof ServerPlayer serverPlayer) {
+                DamageProcessor.process(serverPlayer, event.getSource(), event.getNewDamage());
+
             }
         }
 
@@ -82,6 +60,19 @@ public class ServerEvent {
                 DamageTypeConfig.addGroup(type.msgId());
             }
             DamageTypeConfig.register();
+        }
+
+        @SubscribeEvent
+        public static void onRegisterCommand(RegisterCommandsEvent event) {
+            event.getDispatcher().register(
+                    Commands.literal("damage_number")
+                            .then(Commands.literal("clear")
+                                    .executes(t -> {
+                                        ServerPlayer player = t.getSource().getPlayerOrException();
+                                        DamageProcessor.sendDamageClear(player);
+                                        return 1;
+                                    }))
+            );
         }
     }
 }
