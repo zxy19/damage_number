@@ -4,7 +4,7 @@ import cc.xypp.damage_number.api.decoration.INumberDecoration;
 import cc.xypp.damage_number.data.DamageTextFmt;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.bus.api.Event;
+import net.minecraftforge.eventbus.api.Event;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

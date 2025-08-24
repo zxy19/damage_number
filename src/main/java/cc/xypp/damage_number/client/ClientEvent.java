@@ -2,7 +2,7 @@ package cc.xypp.damage_number.client;
 
 import cc.xypp.damage_number.Config;
 import cc.xypp.damage_number.DamageNumber;
-import cc.xypp.damage_number.data.DamageListItem;
+import cc.xypp.damage_number.DamageTypeConfig;
 import cc.xypp.damage_number.network.DamagePackage;
 import cc.xypp.damage_number.network.Network;
 import cc.xypp.damage_number.screen.ConfigScreen;
@@ -10,16 +10,16 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.CustomizeGuiOverlayEvent;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.common.util.Lazy;
-import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import org.apache.commons.lang3.tuple.MutablePair;
 import org.lwjgl.glfw.GLFW;
+import oshi.util.tuples.Pair;
 
 import java.util.Date;
 import java.util.Objects;
@@ -47,8 +47,7 @@ public class ClientEvent {
                             Data.amount = msg.amount;
                             Data.shakes = 4;
                             Data.combo = msg.combo;
-                            DamageListItem listItem = new DamageListItem(msg.instant, msg.shield);
-                            Data.latest.add(new MutablePair<>(listItem, new Date().getTime()));
+                            Data.latest.add(new Pair<>(new Date().getTime(), msg.data));
                             while (Data.latest.size() != 0 && Data.latest.size() > Config.damageListMaxSize) {
                                 Data.latest.remove(0);
                             }
@@ -61,7 +60,6 @@ public class ClientEvent {
                         }
                         context.get().setPacketHandled(true);
                     });
-
         }
 
         @SubscribeEvent
@@ -71,7 +69,7 @@ public class ClientEvent {
         }
     }
 
-    @Mod.EventBusSubscriber(modid = DamageNumber.MODID,value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
+    @Mod.EventBusSubscriber(modid = DamageNumber.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
     public static class FM {
         @SubscribeEvent
         public static void keyInput(InputEvent.Key event) {
