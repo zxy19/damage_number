@@ -1,11 +1,11 @@
 package cc.xypp.damage_number.api.decoration;
 
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
 public class IconDecoration implements INumberDecoration {
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath("damage_number", "texture_icon");
+    public static final ResourceLocation ID = new ResourceLocation("damage_number", "texture_icon");
 
 
     @Override
@@ -26,7 +26,7 @@ public class IconDecoration implements INumberDecoration {
         this.imageHeight = imageHeight;
     }
 
-    public IconDecoration(RegistryFriendlyByteBuf buf) {
+    public IconDecoration(FriendlyByteBuf buf) {
         this.icon = buf.readResourceLocation();
         this.u = buf.readInt();
         this.v = buf.readInt();
@@ -59,7 +59,7 @@ public class IconDecoration implements INumberDecoration {
     }
 
     @Override
-    public void writeToNetwork(RegistryFriendlyByteBuf buf) {
+    public void writeToNetwork(FriendlyByteBuf buf) {
         buf.writeResourceLocation(icon);
         buf.writeInt(u);
         buf.writeInt(v);

@@ -107,11 +107,11 @@ public class Config
     private static final ForgeConfigSpec.BooleanValue DAMAGE_LIST_SHOW =  BUILDER
             .translation("config.damage_number.damage_list.show")
             .define("damage_list.show", true);
-    private static final ModConfigSpec.BooleanValue DAMAGE_LIST_COLOR_TYPE =  BUILDER
+    private static final ForgeConfigSpec.BooleanValue DAMAGE_LIST_COLOR_TYPE =  BUILDER
             .translation("config.damage_number.damage_list.color_type")
             .comment("Color the damage number by damage type. Configure in damage_number_type.toml")
             .define("damage_list.color_type", false);
-    private static final ModConfigSpec.IntValue DAMAGE_LIST_CLEAR_TIME = BUILDER
+    private static final ForgeConfigSpec.IntValue DAMAGE_LIST_CLEAR_TIME = BUILDER
             .translation("config.damage_number.damage_list.clear_time")
             .comment("How long will number in list disappears")
             .defineInRange("damage_list.clear_time", 2000, 0, Integer.MAX_VALUE);

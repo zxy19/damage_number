@@ -1,18 +1,26 @@
 package cc.xypp.damage_number.client;
 
 import cc.xypp.damage_number.DamageNumber;
-import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.Minecraft;
+import cc.xypp.damage_number.api.decoration.INumberDecoration;
+import cc.xypp.damage_number.api.decoration.IconDecoration;
+import cc.xypp.damage_number.api.decoration.ItemDecoration;
+import cc.xypp.damage_number.api.decoration.render.INumberDecorationRenderer;
+import cc.xypp.damage_number.api.decoration.render.IconDecorationRenderer;
+import cc.xypp.damage_number.api.decoration.render.ItemDecorationRenderer;
+import cc.xypp.damage_number.data.DamageRecord;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 import net.minecraftforge.client.gui.IIngameOverlay;
 import cc.xypp.damage_number.Config;
-import org.apache.commons.lang3.tuple.Pair;
+import oshi.util.tuples.Pair;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 public class DamageRender implements IIngameOverlay {
     private long shakeDiff = 0;
@@ -36,10 +44,6 @@ public class DamageRender implements IIngameOverlay {
     private <T extends INumberDecoration> INumberDecorationRenderer<T> getDecorationRenderer(T decoration) {
         ResourceLocation id = decoration.getId();
         return (INumberDecorationRenderer<T>) renderers.get(id);
-    }
-
-    private String i18n(String s, Object... args) {
-        return I18n.get(String.valueOf(new ResourceLocation(DamageNumber.MODID, s)), args);
     }
 
 
@@ -135,7 +139,7 @@ public class DamageRender implements IIngameOverlay {
             y = (int) (y / scale);
             lh = (int) (lh / scale);
             long currentTime = new Date().getTime();
-            while (Data.latest.size()>0 && Data.latest.get(0).getRight() < currentTime - Config.damageListClearTime) {
+            while (Data.latest.size() > 0 && Data.latest.get(0).getA() < currentTime - Config.damageListClearTime) {
                 Data.latest.remove(0);
             }
 

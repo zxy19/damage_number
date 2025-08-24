@@ -1,16 +1,17 @@
 package cc.xypp.damage_number.api.decoration;
 
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 public class ItemDecoration implements INumberDecoration {
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath("damage_number", "item_icon");
+    public static final ResourceLocation ID = new ResourceLocation("damage_number", "item_icon");
     private final ItemStack item;
 
-    public ItemDecoration(RegistryFriendlyByteBuf registryFriendlyByteBuf) {
-        this.item = ItemStack.parseOptional(registryFriendlyByteBuf.registryAccess(), registryFriendlyByteBuf.readNbt());
+    public ItemDecoration(FriendlyByteBuf registryFriendlyByteBuf) {
+        this.item = ItemStack.of(registryFriendlyByteBuf.readNbt());
     }
 
     public ItemDecoration(ItemStack item) {
@@ -28,7 +29,7 @@ public class ItemDecoration implements INumberDecoration {
     }
 
     @Override
-    public void writeToNetwork(RegistryFriendlyByteBuf buf) {
-        buf.writeNbt(item.saveOptional(buf.registryAccess()));
+    public void writeToNetwork(FriendlyByteBuf buf) {
+        buf.writeNbt(item.save(new CompoundTag()));
     }
 }

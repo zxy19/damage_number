@@ -9,7 +9,7 @@ import cc.xypp.damage_number.data.DamageTextFmt;
 import cc.xypp.damage_number.network.Network;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
-import net.neoforged.neoforge.common.NeoForge;
+import net.minecraftforge.common.MinecraftForge;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -42,7 +42,7 @@ public class DamageProcessor {
                 serverPlayer
         );
 
-        NeoForge.EVENT_BUS.post(event);
+        MinecraftForge.EVENT_BUS.post(event);
 
         damageCount.put(uid, event.getCombo());
         userDamage.put(uid, event.getAmount());
