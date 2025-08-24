@@ -113,7 +113,7 @@ public class Config {
             .define("damage_list.color_type", false);
 
     private static final ModConfigSpec.BooleanValue DAMAGE_RANK_USE = BUILDER
-            .comment("Use damage ranked style")
+            .comment("Use damage ranked color")
             .translation("config.damage_number.damage_rank.use")
             .define("damage_rank.enable", false);
     private static final ModConfigSpec.BooleanValue DAMAGE_RANK_COLOR_NUMBER = BUILDER
@@ -137,7 +137,7 @@ public class Config {
 
 
     private static final ModConfigSpec.BooleanValue COMBO_RANK_USE = BUILDER
-            .comment("Use combo ranked style")
+            .comment("Use combo ranked color")
             .translation("config.damage_number.damage_rank.use")
             .define("combo_rank.enable", false);
     private static final ModConfigSpec.BooleanValue COMBO_RANK_COLOR_NUMBER = BUILDER

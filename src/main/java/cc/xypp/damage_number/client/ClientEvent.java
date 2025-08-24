@@ -42,7 +42,6 @@ public class ClientEvent {
             DamageRender damageRender = new DamageRender();
             event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(DamageNumber.MODID, "damage_number"), damageRender);
         }
-
     }
 
     @EventBusSubscriber(modid = DamageNumber.MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.GAME)

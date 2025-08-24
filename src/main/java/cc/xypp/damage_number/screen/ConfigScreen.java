@@ -1,27 +1,32 @@
 package cc.xypp.damage_number.screen;
 
 import cc.xypp.damage_number.Config;
-import cc.xypp.damage_number.DamageNumber;
+import cc.xypp.damage_number.api.decoration.IconDecoration;
+import cc.xypp.damage_number.api.decoration.ItemDecoration;
 import cc.xypp.damage_number.client.DamageRender;
 import cc.xypp.damage_number.client.Data;
-import com.mojang.blaze3d.vertex.PoseStack;
+import cc.xypp.damage_number.data.DamageRecord;
+import cc.xypp.damage_number.data.DamageTextFmt;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.*;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.CycleButton;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Items;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import org.apache.commons.lang3.tuple.MutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
+import oshi.util.tuples.Pair;
 
-import javax.swing.*;
 import java.util.Date;
+import java.util.List;
 
 @OnlyIn(Dist.CLIENT)
 public class ConfigScreen extends Screen {
@@ -30,6 +35,40 @@ public class ConfigScreen extends Screen {
     private static final int DONE_BUTTON_TOP_OFFSET = 20;
     private static final int CONFIG_PANE_WIDTH = 140;
     private static final int TITLE_HEIGHT = 40;
+
+    private static final DamageRecord TEST = new DamageRecord(
+            233.0f,
+            0xffffffff,
+            DamageTextFmt.DEFAULT_TEXT_FMT,
+            List.of(
+                    new IconDecoration(
+                            ResourceLocation.fromNamespaceAndPath("minecraft", "textures/block/barrel_top.png"),
+                            0, 0,
+                            16, 16,
+                            16, 16
+                    ),
+                    new ItemDecoration(
+                            Items.REDSTONE_BLOCK.getDefaultInstance()
+                    )
+            )
+    );
+
+    private static final DamageRecord TESTB = new DamageRecord(
+            233.0f,
+            0xff80e625,
+            DamageTextFmt.DEFAULT_TEXT_FMT,
+            List.of(
+                    new IconDecoration(
+                            ResourceLocation.fromNamespaceAndPath("minecraft", "textures/block/barrel_top.png"),
+                            0, 0,
+                            16, 16,
+                            16, 16
+                    ),
+                    new ItemDecoration(
+                            Items.REDSTONE_BLOCK.getDefaultInstance()
+                    )
+            )
+    );
 
     private final DamageRender render;
     private GridLayout layout;
@@ -106,13 +145,13 @@ public class ConfigScreen extends Screen {
             readValues(currentKey);
         }
         long currentTime = new Date().getTime();
+        Data.latest.clear();
         while (Data.latest.size() < Config.damageListMaxSize) {
-            Data.latest.add(new MutablePair<>(233.0f, new MutablePair<>(0L,currentTime)));
+            if (Data.latest.size() % 2 == 0)
+                Data.latest.add(new Pair<>(currentTime, TEST));
+            else
+                Data.latest.add(new Pair<>(currentTime, TESTB));
         }
-        while (Data.latest.size() > Config.damageListMaxSize) {
-            Data.latest.remove(0);
-        }
-        Data.latest.forEach((pair) -> pair.getRight().setValue(currentTime));
     }
 
 

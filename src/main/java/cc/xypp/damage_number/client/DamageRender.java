@@ -1,19 +1,28 @@
 package cc.xypp.damage_number.client;
 
+import cc.xypp.damage_number.Config;
 import cc.xypp.damage_number.DamageNumber;
-import com.mojang.blaze3d.vertex.PoseStack;
+import cc.xypp.damage_number.api.decoration.INumberDecoration;
+import cc.xypp.damage_number.api.decoration.IconDecoration;
+import cc.xypp.damage_number.api.decoration.ItemDecoration;
+import cc.xypp.damage_number.api.decoration.render.INumberDecorationRenderer;
+import cc.xypp.damage_number.api.decoration.render.IconDecorationRenderer;
+import cc.xypp.damage_number.api.decoration.render.ItemDecorationRenderer;
+import cc.xypp.damage_number.data.DamageRecord;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import cc.xypp.damage_number.Config;
-import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
+import oshi.util.tuples.Pair;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class DamageRender implements LayeredDraw.Layer {
     private long shakeDiff = 0;
@@ -27,9 +36,20 @@ public class DamageRender implements LayeredDraw.Layer {
         }
     }
 
+    private static final Map<ResourceLocation, INumberDecorationRenderer<?>> renderers = Map.of(
+            IconDecoration.ID, new IconDecorationRenderer(),
+            ItemDecoration.ID, new ItemDecorationRenderer()
+    );
+
+
+    @SuppressWarnings("unchecked")
+    private <T extends INumberDecoration> INumberDecorationRenderer<T> getDecorationRenderer(T decoration) {
+        ResourceLocation id = decoration.getId();
+        return (INumberDecorationRenderer<T>) renderers.get(id);
+    }
 
     @Override
-    public void render(GuiGraphics pGuiGraphics, DeltaTracker pDeltaTracker) {
+    public void render(@NotNull GuiGraphics pGuiGraphics, DeltaTracker pDeltaTracker) {
         this.render(pGuiGraphics, Minecraft.getInstance().font, pDeltaTracker.getGameTimeDeltaPartialTick(true), pGuiGraphics.guiWidth(), pGuiGraphics.guiHeight(), false);
     }
 
@@ -82,8 +102,6 @@ public class DamageRender implements LayeredDraw.Layer {
                 }
             }
         }//RANK OPT
-
-
         if (Config.titleShow) {//TITLE Render
             float scale = (float) Config.titleScale;
             guiGraphics.pose().pushPose();
@@ -119,14 +137,23 @@ public class DamageRender implements LayeredDraw.Layer {
             y = (int) (y / scale);
             lh = (int) (lh / scale);
             long currentTime = new Date().getTime();
-            while (Data.latest.size() > 0 && Data.latest.get(0).getRight().getRight() < currentTime - 2000) {
+            while (Data.latest.size() > 0 && Data.latest.get(0).getA() < currentTime - 2000) {
                 Data.latest.remove(0);
             }
-            for (Pair<Float, Pair<Long, Long>> pair : Data.latest) {
-                guiGraphics.drawString(font, i18n("damage_list.content", String.format("%.1f", pair.getLeft())), x, y, (int) ((pair.getRight().getLeft()) | ((int) (Config.damageListOpacity * 255) << 24)));
+            for (Pair<Long, DamageRecord> recordTime : Data.latest) {
+                DamageRecord record = recordTime.getB();
+                Component component = record.displayFormat().getFinal(String.format("%.1f", record.amount()));
+                guiGraphics.drawString(font,
+                        component,
+                        x,
+                        y,
+                        (int) ((record.color()) | ((int) (Config.damageListOpacity * 255) << 24)));
+                renderAllDecorations(record.decorations(),
+                        guiGraphics,
+                        x + font.width(component),
+                        y);
                 y += lh;
             }
-
             guiGraphics.pose().popPose();
         }//List Render
         if (Config.numberShow) {//Number Render
@@ -172,9 +199,18 @@ public class DamageRender implements LayeredDraw.Layer {
         }//Number Render
     }
 
+    private void renderAllDecorations(List<INumberDecoration> decorations, GuiGraphics guiGraphics, int x, int y) {
+        for (int i = 0; i < decorations.size(); i++) {
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().translate(x + i * 8, y, 0);
+            guiGraphics.pose().scale(0.5f, 0.5f, 0);
+            INumberDecorationRenderer<INumberDecoration> decorationRenderer = getDecorationRenderer(decorations.get(i));
+            decorationRenderer.render(guiGraphics, decorations.get(i), 1);
+            guiGraphics.pose().popPose();
+        }
+    }
+
     private String i18n(String s, Object... args) {
         return I18n.get(String.valueOf(ResourceLocation.fromNamespaceAndPath(DamageNumber.MODID, s)), args);
     }
-
-
 }
