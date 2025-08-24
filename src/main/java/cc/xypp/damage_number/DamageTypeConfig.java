@@ -4,6 +4,7 @@ package cc.xypp.damage_number;
 import cc.xypp.damage_number.api.decoration.INumberDecoration;
 import cc.xypp.damage_number.api.decoration.IconDecoration;
 import cc.xypp.damage_number.api.decoration.ItemDecoration;
+import cc.xypp.damage_number.data.DamageTextFmt;
 import cc.xypp.damage_number.utils.Colors;
 import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
@@ -11,6 +12,7 @@ import com.electronwill.nightconfig.toml.TomlFormat;
 import com.electronwill.nightconfig.toml.TomlParser;
 import com.electronwill.nightconfig.toml.TomlWriter;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageSource;
@@ -28,7 +30,8 @@ import java.util.*;
 
 @EventBusSubscriber(modid = DamageNumber.MODID, bus = EventBusSubscriber.Bus.MOD)
 public class DamageTypeConfig {
-    record StyleRecord(String color, ResourceLocation itemStack, ResourceLocation icon) {
+    record StyleRecord(String color, ResourceLocation itemStack, ResourceLocation icon, String prependKey,
+                       String appendKey, String formatKey) {
     }
 
     static CommentedConfig config;
@@ -122,17 +125,35 @@ public class DamageTypeConfig {
             config.set(prefix + ".icon.item", "");
             change = true;
         }
+        if (!config.contains(prefix + ".format.prepend")) {
+            config.set(prefix + ".format.prepend", "");
+            change = true;
+        }
+        if (!config.contains(prefix + ".format.append")) {
+            config.set(prefix + ".format.append", "");
+            change = true;
+        }
+        if (!config.contains(prefix + ".format.format")) {
+            config.set(prefix + ".format.format", "");
+            change = true;
+        }
 
 
         String color = config.get(prefix + ".color");
         String iconTex = config.get(prefix + ".icon.tex");
         String iconItem = config.get(prefix + ".icon.item");
+        String iconPrepend = config.get(prefix + ".format.prepend");
+        String iconAppend = config.get(prefix + ".format.append");
+        String iconFormat = config.get(prefix + ".format.format");
 
 
         target.put(id, new StyleRecord(
                 color,
                 iconItem.isEmpty() ? null : ResourceLocation.tryParse(iconItem),
-                iconTex.isEmpty() ? null : ResourceLocation.tryParse(iconTex)
+                iconTex.isEmpty() ? null : ResourceLocation.tryParse(iconTex),
+                iconPrepend,
+                iconAppend,
+                iconFormat
         ));
         priority.put(id, config.getIntOrElse(prefix + ".priority", 0));
         return change;
@@ -186,6 +207,62 @@ public class DamageTypeConfig {
         }
         lastMatching = matching;
         return color;
+    }
+
+    public static DamageTextFmt getTextFmtForDamageType(DamageSource damageSource) {
+        DamageTextFmt textFmt = DamageTextFmt.getDefault();
+        List<Pair<Integer, Pair<Integer, String>>> textFormats = new ArrayList<>();
+        if (typePriority.containsKey(damageSource.type().msgId())) {
+            addTextFormat(damageSource.type().msgId(), textFormats, typeStyle, typePriority);
+        }
+
+        for (TagKey<DamageType> tag : damageSource.typeHolder().tags().toList()) {
+            if (tagPriority.containsKey(tag.location().toString())) {
+                if (damageSource.is(tag)) {
+                    addTextFormat(tag.location().toString(), textFormats, tagStyle, tagPriority);
+                }
+            }
+        }
+        textFormats.stream()
+                .sorted(Comparator.comparingInt(Pair::getA))
+                .forEach(pair -> {
+                    switch (pair.getB().getA()) {
+                        case 0 -> textFmt.setFormatKey(pair.getB().getB());
+                        case 1 -> textFmt.append(Component.translatable(pair.getB().getB()));
+                        case 2 -> textFmt.prepend(Component.translatable(pair.getB().getB()));
+                    }
+                });
+        return textFmt;
+    }
+
+    private static void addTextFormat(String id, List<Pair<Integer, Pair<Integer, String>>> textFormats, Map<String, StyleRecord> tagStyle, Map<String, Integer> tagPriority) {
+        if (!tagStyle.get(id).formatKey().isBlank()) {
+            textFormats.add(new Pair<>(
+                    tagPriority.get(id),
+                    new Pair<>(
+                            0,
+                            tagStyle.get(id).formatKey()
+                    )
+            ));
+        }
+        if (!tagStyle.get(id).appendKey().isBlank()) {
+            textFormats.add(new Pair<>(
+                    tagPriority.get(id),
+                    new Pair<>(
+                            1,
+                            tagStyle.get(id).appendKey()
+                    )
+            ));
+        }
+        if (!tagStyle.get(id).prependKey().isBlank()) {
+            textFormats.add(new Pair<>(
+                    tagPriority.get(id),
+                    new Pair<>(
+                            2,
+                            tagStyle.get(id).prependKey()
+                    )
+            ));
+        }
     }
 
     public static List<INumberDecoration> getDecorationsForDamageType(DamageSource damageSource) {
