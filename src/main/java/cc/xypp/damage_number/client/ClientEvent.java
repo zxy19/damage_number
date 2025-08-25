@@ -78,10 +78,11 @@ public class ClientEvent {
             }
         }
 
-        @SubscribeEvent
-        public static void debug(CustomizeGuiOverlayEvent.DebugText event) {
-            if (Config.damageListShow)
-                event.getLeft().add("Last Damage Number Color Type:" + DamageTypeConfig.lastMatching);
-        }
+        //TODO
+//        @SubscribeEvent
+//        public static void debug(CustomizeGuiOverlayEvent.DebugText event) {
+//            if (Config.damageListShow)
+//                event.getLeft().add("Last Damage Number Color Type:" + DamageTypeConfig.lastMatching);
+//        }
     }
 }
