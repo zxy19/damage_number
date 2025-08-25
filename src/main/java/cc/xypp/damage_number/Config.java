@@ -1,6 +1,7 @@
 package cc.xypp.damage_number;
 
 
+import net.minecraftforge.common.ForgeConfigSpec;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.config.ModConfigEvent;
@@ -33,6 +34,9 @@ public class Config {
     private static final ModConfigSpec.BooleanValue SHOW_DAMAGE = BUILDER
             .translation("config.damage_number.show")
             .define("show", true);
+    private static final ModConfigSpec.BooleanValue USE_MIXIN_DAMAGE_GETTER = BUILDER
+            .translation("config.damage_number.use_mixin_damage_getter")
+            .define("use_mixin_damage_getter", false);
     private static final ModConfigSpec.BooleanValue NO_SHAKE = BUILDER
             .translation("config.damage_number.no_shake")
             .define("no_shake", false);
@@ -169,6 +173,7 @@ public class Config {
     public static boolean showDamage;
     public static boolean noShake;
     public static int clearTime;
+    public static boolean useMixinDamageGetter;
     //Damage Number Options
     public static int numberX;
     public static int numberY;
@@ -232,6 +237,7 @@ public class Config {
         showDamage = SHOW_DAMAGE.get();
         noShake = NO_SHAKE.get();
         clearTime = CLEAR_TIME.get();
+        useMixinDamageGetter = USE_MIXIN_DAMAGE_GETTER.get();
         numberX = NUMBER_X.get();
         numberY = NUMBER_Y.get();
         numberScale = (float) (double) NUMBER_SCALE.get();
@@ -277,6 +283,7 @@ public class Config {
         SHOW_DAMAGE.set(showDamage);
         NO_SHAKE.set(noShake);
         CLEAR_TIME.set(clearTime);
+        USE_MIXIN_DAMAGE_GETTER.set(useMixinDamageGetter);
         NUMBER_X.set(numberX);
         NUMBER_Y.set(numberY);
         NUMBER_SCALE.set((double) numberScale);
