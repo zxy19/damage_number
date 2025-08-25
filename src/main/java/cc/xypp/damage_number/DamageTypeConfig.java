@@ -12,6 +12,7 @@ import com.electronwill.nightconfig.toml.TomlFormat;
 import com.electronwill.nightconfig.toml.TomlParser;
 import com.electronwill.nightconfig.toml.TomlWriter;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.item.Item;
@@ -271,8 +272,8 @@ public class DamageTypeConfig {
                 .forEach(pair -> {
                     switch (pair.getB().getA()) {
                         case 0 -> textFmt.setFormatKey(pair.getB().getB());
-                        case 1 -> textFmt.append(Component.translatable(pair.getB().getB()));
-                        case 2 -> textFmt.prepend(Component.translatable(pair.getB().getB()));
+                        case 1 -> textFmt.append(new TranslatableComponent(pair.getB().getB()));
+                        case 2 -> textFmt.prepend(new TranslatableComponent(pair.getB().getB()));
                     }
                 });
         return textFmt;

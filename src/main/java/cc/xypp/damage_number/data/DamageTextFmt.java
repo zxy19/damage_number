@@ -3,9 +3,11 @@ package cc.xypp.damage_number.data;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class DamageTextFmt {
-    public static final DamageTextFmt DEFAULT_TEXT_FMT = new DamageTextFmt("damage_list.content", Component.empty(), Component.empty());
+    public static final DamageTextFmt DEFAULT_TEXT_FMT = new DamageTextFmt("damage_list.content", TextComponent.EMPTY, TextComponent.EMPTY);
     String formatKey;
     Component prepend;
     Component append;
@@ -17,7 +19,7 @@ public class DamageTextFmt {
     }
 
     public static DamageTextFmt getDefault() {
-        return new DamageTextFmt("damage_list.content", Component.empty(), Component.empty());
+        return new DamageTextFmt("damage_list.content", TextComponent.EMPTY.copy(), TextComponent.EMPTY.copy());
     }
 
     public static DamageTextFmt fromNetwork(FriendlyByteBuf buf) {
@@ -47,6 +49,6 @@ public class DamageTextFmt {
     }
 
     public Component getFinal(String format) {
-        return prepend.copy().append(Component.translatable(format, formatKey)).append(append);
+        return prepend.copy().append(new TranslatableComponent(format, formatKey)).append(append);
     }
 }

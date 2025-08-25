@@ -3,14 +3,12 @@ package cc.xypp.damage_number.server;
 import cc.xypp.damage_number.DamageNumber;
 import cc.xypp.damage_number.DamageTypeConfig;
 import net.minecraft.commands.Commands;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
-import net.minecraftforge.event.level.LevelEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -33,8 +31,8 @@ public class ServerEvent {
         }
 
         @SubscribeEvent
-        static void LevelLoaded(LevelEvent.Load event) {
-            if (event.getLevel().isClientSide()) return;
+        static void LevelLoaded(PlayerEvent.PlayerLoggedInEvent event) {
+            if (event.getPlayer().level.isClientSide()) return;
             DamageTypeConfig.register();
         }
 
