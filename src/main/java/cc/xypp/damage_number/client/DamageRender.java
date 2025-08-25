@@ -176,8 +176,7 @@ public class DamageRender implements IIngameOverlay {
                 }
                 if (confirmTime != 0 && new Date().getTime() - confirmTime > 1500) {
                     confirmTime = 0;
-                    Data.confirm = false;
-                    Data.show = false;
+                    Data.clear();
                 }
             }
 
