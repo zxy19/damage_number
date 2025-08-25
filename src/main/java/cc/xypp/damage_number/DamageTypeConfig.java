@@ -312,31 +312,31 @@ public class DamageTypeConfig {
     public static List<INumberDecoration> getDecorationsForDamageType(DamageSource damageSource) {
         List<Pair<Integer, INumberDecoration>> decorations = new ArrayList<>();
         if (typePriority.containsKey(damageSource.getMsgId())) {
-            addDecoration(damageSource.getMsgId(), decorations, typeStyle);
+            addDecoration(damageSource.getMsgId(), decorations, typeStyle, typePriority);
         }
         for (Map.Entry<String, Predicate<DamageSource>> tag : TagLikePredicate.entrySet()) {
             if (tagPriority.containsKey(tag.getKey())) {
                 if (tag.getValue().test(damageSource)) {
-                    addDecoration(tag.getKey(), decorations, tagStyle);
+                    addDecoration(tag.getKey(), decorations, tagStyle, tagPriority);
                 }
             }
         }
         return decorations.stream().sorted(Comparator.comparingInt(Pair::getA)).map(Pair::getB).toList();
     }
 
-    private static void addDecoration(String id, List<Pair<Integer, INumberDecoration>> decorations, Map<String, StyleRecord> styleRecordMap) {
+    private static void addDecoration(String id, List<Pair<Integer, INumberDecoration>> decorations, Map<String, StyleRecord> styleRecordMap, Map<String, Integer> priorityMap) {
         if (!styleRecordMap.containsKey(id))
             return;
         if (styleRecordMap.get(id).icon() != null) {
             decorations.add(new Pair<>(
-                    typePriority.get(id),
+                    priorityMap.get(id),
                     new IconDecoration(styleRecordMap.get(id).icon(), 0, 0, 64, 64, 64, 64)
             ));
         }
         if (styleRecordMap.get(id).itemStack() != null) {
             Optional<Item> item = Optional.ofNullable(ForgeRegistries.ITEMS.getValue(styleRecordMap.get(id).itemStack()));
             item.ifPresent(value -> decorations.add(new Pair<>(
-                    typePriority.get(id),
+                    priorityMap.get(id),
                     new ItemDecoration(value.getDefaultInstance())
             )));
         }
