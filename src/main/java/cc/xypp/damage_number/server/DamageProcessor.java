@@ -11,10 +11,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.neoforged.neoforge.common.NeoForge;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DamageProcessor {
     static Map<String, Float> userDamage = new HashMap<>();
@@ -36,7 +33,7 @@ public class DamageProcessor {
                 newDamage,
                 damageCount.getOrDefault(uid, 0) + 1,
                 defaultColor,
-                decorations,
+                new ArrayList<>(decorations),
                 textFormat,
                 source,
                 serverPlayer
