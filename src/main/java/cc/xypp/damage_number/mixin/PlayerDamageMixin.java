@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Player.class)
 public class PlayerDamageMixin {
-    @Inject(method = "actuallyHurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;getHealth()F"), require = 0)
+    @Inject(method = "actuallyHurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;getHealth()F"), require = 0, remap = false)
     public void actuallyHurt(DamageSource p_21240_, float p_21241_, CallbackInfo ci, @Local(name = "f1") float f1) {
         if (!Config.useMixinDamageGetter) return;
         if (p_21240_.getEntity() instanceof ServerPlayer serverPlayer)
