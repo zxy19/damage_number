@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "cc.xypp.damage_number.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "damage_number.refmap.json",
+  "mixins": [
+    "EntityDamageMixin",
+    "PlayerDamageMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 0
+  }
+}
