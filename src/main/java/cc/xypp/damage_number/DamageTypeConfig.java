@@ -11,21 +11,20 @@ import com.electronwill.nightconfig.core.io.WritingMode;
 import com.electronwill.nightconfig.toml.TomlFormat;
 import com.electronwill.nightconfig.toml.TomlParser;
 import com.electronwill.nightconfig.toml.TomlWriter;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 import oshi.util.tuples.Pair;
 
 import java.io.FileReader;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Predicate;
 
 
 @Mod.EventBusSubscriber(modid = DamageNumber.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -33,6 +32,42 @@ public class DamageTypeConfig {
     record StyleRecord(String color, ResourceLocation itemStack, ResourceLocation icon, String prependKey,
                        String appendKey, String formatKey) {
     }
+
+    private static Map<String, Predicate<DamageSource>> TagLikePredicate = Map.of(
+            "isDamageHelmet", DamageSource::isDamageHelmet,
+            "isBypassArmor", DamageSource::isBypassArmor,
+            "isDamageFire", DamageSource::isFire,
+            "isDamageMagic", DamageSource::isMagic,
+            "isDamageProjectile", DamageSource::isProjectile,
+            "isDamageExplosion", DamageSource::isExplosion,
+            "isFall", DamageSource::isFall,
+            "isBypassInvul", DamageSource::isBypassInvul
+    );
+    private static List<String> builtInMsgIds = List.of(
+            "inFire",
+            "lightningBolt",
+            "onFire",
+            "lava",
+            "hotFloor",
+            "inWall",
+            "cramming",
+            "drown",
+            "starve",
+            "cactus",
+            "flyIntoWall",
+            "outOfWorld",
+            "generic",
+            "magic",
+            "wither",
+            "anvil",
+            "fallingBlock",
+            "dragonBreath",
+            "dryout",
+            "sweetBerryBush",
+            "freeze",
+            "fallingStalactite",
+            "stalagmite"
+    );
 
     static CommentedConfig config;
     static Map<String, Integer> typePriority = new HashMap<>();
@@ -45,16 +80,19 @@ public class DamageTypeConfig {
     static boolean randomColorForType = false;
     public static String lastMatching = "null";
 
-    public static void addGroup(String id) {
-        typeList.add(id);
-    }
-
-    public static void addTagGroup(String id) {
-        tagList.add(id);
-    }
-
     public static void register() {
         load();
+    }
+
+    private static void collectKeys(Set<String> keys, String currentPath, CommentedConfig currentConfig) {
+        if (currentConfig.contains("priority")) {
+            keys.add(currentPath);
+        }
+        for (CommentedConfig.Entry key : currentConfig.entrySet()) {
+            if (key.getValue() instanceof CommentedConfig c) {
+                collectKeys(keys, (currentPath.isEmpty() ? "" : (currentPath + ".")) + key.getKey(), c);
+            }
+        }
     }
 
     public static void load() {
@@ -83,6 +121,11 @@ public class DamageTypeConfig {
             change = true;
         }
         randomColorForType = config.getOrElse("sys.randomColorForType", false);
+
+        typeList = new HashSet<>();
+        collectKeys(typeList, "", config.get("type"));
+        typeList.addAll(builtInMsgIds);
+        tagList = TagLikePredicate.keySet();
 
         for (String id : typeList) {
             change |= loadFor(typeStyle, typePriority, "type", id);
@@ -178,29 +221,29 @@ public class DamageTypeConfig {
         long maxPriority = -0x7fffffff;
         long color = 0xffffff;
         String matching = "null";
-        if (typePriority.containsKey(damageSource.type().msgId())) {
+        if (typePriority.containsKey(damageSource.getMsgId())) {
             if (
-                    typePriority.get(damageSource.type().msgId()) >= maxPriority
+                    typePriority.get(damageSource.getMsgId()) >= maxPriority
                             &&
-                            !typeStyle.get(damageSource.type().msgId()).color().equals("[NO-VALUE]")
+                            !typeStyle.get(damageSource.getMsgId()).color().equals("[NO-VALUE]")
             ) {
-                maxPriority = typePriority.get(damageSource.type().msgId());
-                color = Colors.toColor(typeStyle.get(damageSource.type().msgId()).color());
-                matching = "ID:" + damageSource.type().msgId();
+                maxPriority = typePriority.get(damageSource.getMsgId());
+                color = Colors.toColor(typeStyle.get(damageSource.getMsgId()).color());
+                matching = "ID:" + damageSource.getMsgId();
             }
         }
 
-        for (TagKey<DamageType> tag : damageSource.typeHolder().tags().toList()) {
-            if (tagPriority.containsKey(tag.location().toString())) {
-                if (damageSource.is(tag)) {
+        for (Map.Entry<String, Predicate<DamageSource>> tag : TagLikePredicate.entrySet()) {
+            if (tagPriority.containsKey(tag.getKey())) {
+                if (tag.getValue().test(damageSource)) {
                     if (
-                            tagPriority.get(tag.location().toString()) >= maxPriority
+                            tagPriority.get(tag.getKey()) >= maxPriority
                                     &&
-                                    !tagStyle.get(tag.location().toString()).color().equals("[NO-VALUE]")
+                                    !tagStyle.get(tag.getKey()).color().equals("[NO-VALUE]")
                     ) {
-                        maxPriority = tagPriority.get(tag.location().toString());
-                        color = Colors.toColor(tagStyle.get(tag.location().toString()).color());
-                        matching = "TAG:" + tag.location().toString();
+                        maxPriority = tagPriority.get(tag.getKey());
+                        color = Colors.toColor(tagStyle.get(tag.getKey()).color());
+                        matching = "TAG:" + tag.getKey();
                     }
                 }
             }
@@ -212,14 +255,14 @@ public class DamageTypeConfig {
     public static DamageTextFmt getTextFmtForDamageType(DamageSource damageSource) {
         DamageTextFmt textFmt = DamageTextFmt.getDefault();
         List<Pair<Integer, Pair<Integer, String>>> textFormats = new ArrayList<>();
-        if (typePriority.containsKey(damageSource.type().msgId())) {
-            addTextFormat(damageSource.type().msgId(), textFormats, typeStyle, typePriority);
+        if (typePriority.containsKey(damageSource.getMsgId())) {
+            addTextFormat(damageSource.getMsgId(), textFormats, typeStyle, typePriority);
         }
 
-        for (TagKey<DamageType> tag : damageSource.typeHolder().tags().toList()) {
-            if (tagPriority.containsKey(tag.location().toString())) {
-                if (damageSource.is(tag)) {
-                    addTextFormat(tag.location().toString(), textFormats, tagStyle, tagPriority);
+        for (Map.Entry<String, Predicate<DamageSource>> tag : TagLikePredicate.entrySet()) {
+            if (tagPriority.containsKey(tag.getKey())) {
+                if (tag.getValue().test(damageSource)) {
+                    addTextFormat(tag.getKey(), textFormats, tagStyle, tagPriority);
                 }
             }
         }
@@ -267,13 +310,13 @@ public class DamageTypeConfig {
 
     public static List<INumberDecoration> getDecorationsForDamageType(DamageSource damageSource) {
         List<Pair<Integer, INumberDecoration>> decorations = new ArrayList<>();
-        if (typePriority.containsKey(damageSource.type().msgId())) {
-            addDecoration(damageSource.type().msgId(), decorations, typeStyle);
+        if (typePriority.containsKey(damageSource.getMsgId())) {
+            addDecoration(damageSource.getMsgId(), decorations, typeStyle);
         }
-        for (TagKey<DamageType> tag : damageSource.typeHolder().tags().toList()) {
-            if (tagPriority.containsKey(tag.location().toString())) {
-                if (damageSource.is(tag)) {
-                    addDecoration(tag.location().toString(), decorations, tagStyle);
+        for (Map.Entry<String, Predicate<DamageSource>> tag : TagLikePredicate.entrySet()) {
+            if (tagPriority.containsKey(tag.getKey())) {
+                if (tag.getValue().test(damageSource)) {
+                    addDecoration(tag.getKey(), decorations, tagStyle);
                 }
             }
         }
@@ -290,7 +333,7 @@ public class DamageTypeConfig {
             ));
         }
         if (styleRecordMap.get(id).itemStack() != null) {
-            Optional<Item> item = BuiltInRegistries.ITEM.getOptional(styleRecordMap.get(id).itemStack());
+            Optional<Item> item = Optional.ofNullable(ForgeRegistries.ITEMS.getValue(styleRecordMap.get(id).itemStack()));
             item.ifPresent(value -> decorations.add(new Pair<>(
                     typePriority.get(id),
                     new ItemDecoration(value.getDefaultInstance())
