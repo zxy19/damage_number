@@ -202,7 +202,7 @@ public class DamageRender implements LayeredDraw.Layer {
         for (int i = 0; i < decorations.size(); i++) {
             guiGraphics.pose().pushPose();
             guiGraphics.pose().translate(x + i * 8, y, 0);
-            guiGraphics.pose().scale(0.5f, 0.5f, 0);
+            guiGraphics.pose().scale(0.5f, 0.5f, 1);
             INumberDecorationRenderer<INumberDecoration> decorationRenderer = getDecorationRenderer(decorations.get(i));
             decorationRenderer.render(guiGraphics, decorations.get(i), 1);
             guiGraphics.pose().popPose();
