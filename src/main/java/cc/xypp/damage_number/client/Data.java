@@ -14,4 +14,10 @@ public class Data {
     public static boolean confirm = true;
     public static List<Pair<Long,DamageRecord>> latest = new ArrayList<>();
     public static int combo = 0;
+
+    public static void clear() {
+        latest.clear();
+        confirm = false;
+        show = false;
+    }
 }
