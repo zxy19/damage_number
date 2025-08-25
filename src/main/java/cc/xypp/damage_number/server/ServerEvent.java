@@ -1,5 +1,6 @@
 package cc.xypp.damage_number.server;
 
+import cc.xypp.damage_number.Config;
 import cc.xypp.damage_number.DamageNumber;
 import cc.xypp.damage_number.DamageTypeConfig;
 import net.minecraft.commands.Commands;
@@ -28,6 +29,7 @@ public class ServerEvent {
 
         @SubscribeEvent(priority = EventPriority.LOWEST)
         public static void onDamagePost(LivingDamageEvent event) {
+            if (Config.useMixinDamageGetter) return;
             Entity entity = event.getSource().getEntity();
             if (entity instanceof ServerPlayer serverPlayer) {
                 DamageProcessor.process(serverPlayer, event.getSource(), event.getAmount());
