@@ -1,5 +1,6 @@
 package cc.xypp.damage_number.client;
 
+import cc.xypp.damage_number.Config;
 import cc.xypp.damage_number.DamageNumber;
 import cc.xypp.damage_number.api.decoration.INumberDecoration;
 import cc.xypp.damage_number.api.decoration.IconDecoration;
@@ -8,6 +9,7 @@ import cc.xypp.damage_number.api.decoration.render.INumberDecorationRenderer;
 import cc.xypp.damage_number.api.decoration.render.IconDecorationRenderer;
 import cc.xypp.damage_number.api.decoration.render.ItemDecorationRenderer;
 import cc.xypp.damage_number.data.DamageRecord;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.resources.language.I18n;
@@ -48,10 +50,10 @@ public class DamageRender implements IGuiOverlay {
 
     @Override
     public void render(ForgeGui gui, PoseStack poseStack, float partialTick, int screenWidth, int screenHeight) {
-        this.render(poseStack, gui.getFont(), partialTick, screenWidth, screenHeight,false);
+        this.render(poseStack, gui.getFont(), partialTick, screenWidth, screenHeight, false);
     }
 
-    public void render(PoseStack poseStack, Font font, float partialTick, int screenWidth, int screenHeight,boolean alwaysShow){
+    public void render(PoseStack poseStack, Font font, float partialTick, int screenWidth, int screenHeight, boolean alwaysShow) {
         if (!Config.showDamage) return;
         if (!Data.show && !alwaysShow) return;
         String titleContent = i18n("title.content");
@@ -200,22 +202,19 @@ public class DamageRender implements IGuiOverlay {
             poseStack.popPose();
         }//Number Render
     }
+
     private String i18n(String s, Object... args) {
         return I18n.get(String.valueOf(new ResourceLocation(DamageNumber.MODID, s)), args);
     }
 
     private void renderAllDecorations(List<INumberDecoration> decorations, PoseStack poseStack, int x, int y) {
         for (int i = 0; i < decorations.size(); i++) {
-            guiGraphics.pose().pushPose();
-            guiGraphics.pose().translate(x + i * 8, y, 0);
-            guiGraphics.pose().scale(0.5f, 0.5f, 0);
+            poseStack.pushPose();
+            poseStack.translate(x + i * 8, y, 0);
+            poseStack.scale(0.5f, 0.5f, 1);
             INumberDecorationRenderer<INumberDecoration> decorationRenderer = getDecorationRenderer(decorations.get(i));
-            decorationRenderer.render(guiGraphics, decorations.get(i), 1);
-            guiGraphics.pose().popPose();
+            decorationRenderer.render(poseStack, decorations.get(i), 1);
+            poseStack.popPose();
         }
-    }
-
-    private String i18n(String s, Object... args) {
-        return I18n.get(String.valueOf(new ResourceLocation(DamageNumber.MODID, s)), args);
     }
 }

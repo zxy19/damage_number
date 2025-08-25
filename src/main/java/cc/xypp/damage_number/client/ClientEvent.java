@@ -2,7 +2,7 @@ package cc.xypp.damage_number.client;
 
 import cc.xypp.damage_number.Config;
 import cc.xypp.damage_number.DamageNumber;
-import cc.xypp.damage_number.data.DamageListItem;
+import cc.xypp.damage_number.DamageTypeConfig;
 import cc.xypp.damage_number.network.DamagePackage;
 import cc.xypp.damage_number.network.Network;
 import cc.xypp.damage_number.screen.ConfigScreen;
@@ -83,10 +83,10 @@ public class ClientEvent {
             }
         }
 
-        @SubscribeEvent
-        public static void debug(CustomizeGuiOverlayEvent.DebugText event) {
-            if (Config.damageListShow)
-                event.getLeft().add("Last Damage Number Color Type:" + DamageTypeConfig.lastMatching);
-        }
+//        @SubscribeEvent//TODO
+//        public static void debug(CustomizeGuiOverlayEvent.DebugText event) {
+//            if (Config.damageListShow && Minecraft.getInstance().setting)
+//                event.getLeft().add("Last Damage Number Color Type:" + DamageTypeConfig.lastMatching);
+//        }
     }
 }

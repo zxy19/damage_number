@@ -1,8 +1,8 @@
 package cc.xypp.damage_number.api.decoration.render;
 
 import cc.xypp.damage_number.api.decoration.INumberDecoration;
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 
 public interface INumberDecorationRenderer<T extends INumberDecoration> {
-    void render(GuiGraphics guiGraphics, T decoration, float pt);
+    void render(PoseStack poseStack, T decoration, float pt);
 }

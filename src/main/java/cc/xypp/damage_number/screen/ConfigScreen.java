@@ -5,20 +5,23 @@ import cc.xypp.damage_number.api.decoration.IconDecoration;
 import cc.xypp.damage_number.api.decoration.ItemDecoration;
 import cc.xypp.damage_number.client.DamageRender;
 import cc.xypp.damage_number.client.Data;
+import cc.xypp.damage_number.data.DamageRecord;
+import cc.xypp.damage_number.data.DamageTextFmt;
+import cc.xypp.damage_number.widget.GridLayout;
+import cc.xypp.damage_number.widget.StringWidget;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.*;
-import net.minecraft.client.gui.layouts.GridLayout;
-import net.minecraft.client.gui.layouts.LinearLayout;
+import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.CycleButton;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import org.apache.commons.lang3.tuple.MutablePair;
-import org.apache.commons.lang3.tuple.Pair;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Items;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 import oshi.util.tuples.Pair;
@@ -63,7 +66,7 @@ public class ConfigScreen extends Screen {
                             16, 16
                     ),
                     new ItemDecoration(
-                            Items.REDSTONE_BLOCK.getDefaultInstance()
+                            Items.GOLDEN_APPLE.getDefaultInstance()
                     )
             )
     );
@@ -155,7 +158,7 @@ public class ConfigScreen extends Screen {
     @Override
     public void render(@NotNull PoseStack poseStack, int pMouseX, int pMouseY, float pPartialTick) {
         this.renderBackground(poseStack);
-        GuiComponent.drawString(poseStack,this.font,
+        GuiComponent.drawString(poseStack, this.font,
                 I18n.get("damage_number:config.title"),
                 this.width / 2 - this.font.width(I18n.get("damage_number:config.title")) / 2,
                 10,
