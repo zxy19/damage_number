@@ -35,12 +35,7 @@ public class Network {
                 Data.amount = payload.amount();
                 if (!Config.noShake) Data.shakes = 4;
                 Data.combo = payload.combo();
-                Data.latest.add(new Pair<>(new Date().getTime(), payload.data()));
-                while (Data.latest.size() != 0 && Data.latest.size() > Config.damageListMaxSize) {
-                    Data.latest.remove(0);
-                }
-                Data.confirm = false;
-                Data.show = true;
+                Data.add(new Pair<>(new Date().getTime(), payload.data()));
             } else if (Objects.equals(payload.t(), "total")) {
                 Data.amount = payload.amount();
                 Data.confirm = true;
