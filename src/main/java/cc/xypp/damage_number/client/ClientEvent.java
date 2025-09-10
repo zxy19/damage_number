@@ -2,7 +2,6 @@ package cc.xypp.damage_number.client;
 
 import cc.xypp.damage_number.Config;
 import cc.xypp.damage_number.DamageNumber;
-import cc.xypp.damage_number.DamageTypeConfig;
 import cc.xypp.damage_number.network.DamagePackage;
 import cc.xypp.damage_number.network.Network;
 import cc.xypp.damage_number.screen.ConfigScreen;
@@ -39,14 +38,9 @@ public class ClientEvent {
                     (msg, context) -> {
                         if (Objects.equals(msg.type, "emit")) {
                             Data.amount = msg.amount;
-                            Data.shakes = 4;
+                            if (!Config.noShake) Data.shakes = 4;
                             Data.combo = msg.combo;
-                            Data.latest.add(new Pair<>(new Date().getTime(), msg.data));
-                            while (Data.latest.size() != 0 && Data.latest.size() > Config.damageListMaxSize) {
-                                Data.latest.remove(0);
-                            }
-                            Data.confirm = false;
-                            Data.show = true;
+                            Data.add(new Pair<>(new Date().getTime(), msg.data));
                         } else if (Objects.equals(msg.type, "total")) {
                             Data.amount = msg.amount;
                             Data.confirm = true;
