@@ -10,6 +10,7 @@ import cc.xypp.damage_number.network.Network;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraftforge.common.MinecraftForge;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -19,12 +20,19 @@ public class DamageProcessor {
     static Map<String, Integer> damageCount = new HashMap<>();
 
     public static void process(ServerPlayer serverPlayer, DamageSource source, float newDamage) {
-        long defaultColor = DamageTypeConfig.getColorForDamageType(source);
-        List<INumberDecoration> decorations = DamageTypeConfig.getDecorationsForDamageType(source);
-        DamageTextFmt textFormat = DamageTypeConfig.getTextFmtForDamageType(source);
+        process(serverPlayer, source, newDamage, null, null, null);
+    }
+
+    public static void process(ServerPlayer serverPlayer, DamageSource source, float newDamage, @Nullable Long defaultColor, @Nullable List<INumberDecoration> decorations, @Nullable DamageTextFmt textFormat) {
+        if (defaultColor == null)
+            defaultColor = DamageTypeConfig.getColorForDamageType(source);
+        if (decorations == null)
+            decorations = DamageTypeConfig.getDecorationsForDamageType(source);
+        if (textFormat == null)
+            textFormat = DamageTypeConfig.getTextFmtForDamageType(source);
         String uid = serverPlayer.getUUID().toString();
 
-        process(serverPlayer, source, newDamage, uid, (int) defaultColor, decorations, textFormat);
+        process(serverPlayer, source, newDamage, uid, defaultColor.intValue(), decorations, textFormat);
     }
 
     public static void process(ServerPlayer serverPlayer, DamageSource source, float newDamage, String uid, int defaultColor, List<INumberDecoration> decorations, DamageTextFmt textFormat) {
