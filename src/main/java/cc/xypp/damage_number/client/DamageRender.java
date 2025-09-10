@@ -57,6 +57,7 @@ public class DamageRender implements IIngameOverlay {
 
     public void render(PoseStack poseStack, Font font, float partialTick, int screenWidth, int screenHeight, boolean alwaysShow){
         if (!Config.showDamage) return;
+        Data.update();
         if (!Data.show && !alwaysShow) return;
         String titleContent = i18n("title.content");
         long titleColor = 0xFFFFFF;
@@ -140,11 +141,6 @@ public class DamageRender implements IIngameOverlay {
             x = (int) (x / scale);
             y = (int) (y / scale);
             lh = (int) (lh / scale);
-            long currentTime = new Date().getTime();
-            while (Data.latest.size() > 0 && Data.latest.get(0).getA() < currentTime - Config.damageListClearTime) {
-                Data.latest.remove(0);
-            }
-
             for (Pair<Long, DamageRecord> recordTime : Data.latest) {
                 DamageRecord record = recordTime.getB();
                 Component component = record.displayFormat().getFinal(String.format("%.1f", record.amount()));
