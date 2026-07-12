@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import static cc.xypp.damage_number.utils.Colors.toColor;
 
 
-@EventBusSubscriber(modid = DamageNumber.MODID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = DamageNumber.MODID)
 public class Config {
 
     public static class RankOptionItem {

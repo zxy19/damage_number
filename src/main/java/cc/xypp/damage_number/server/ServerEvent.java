@@ -1,13 +1,12 @@
 package cc.xypp.damage_number.server;
 
 import cc.xypp.damage_number.Config;
-import cc.xypp.damage_number.Config;
 import cc.xypp.damage_number.DamageNumber;
 import cc.xypp.damage_number.DamageTypeConfig;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
@@ -21,7 +20,7 @@ import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 public class ServerEvent {
 
-    @EventBusSubscriber(modid = DamageNumber.MODID, bus = EventBusSubscriber.Bus.GAME)
+    @EventBusSubscriber(modid = DamageNumber.MODID)
     public static class FORGE {
         @SubscribeEvent
         public static void onPlayerTick(PlayerTickEvent.Pre event) {
@@ -42,16 +41,13 @@ public class ServerEvent {
         @SubscribeEvent
         static void LevelLoaded(LevelEvent.Load event) {
             if (event.getLevel().isClientSide()) return;
-            Registry<DamageType> registry = event.getLevel().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
-            for (ResourceLocation typeKey : registry.keySet()) {
-                DamageType type = registry.get(typeKey);
-                registry.holders().forEach(holder -> {
-                    holder.tags().forEach(tag -> {
-                        DamageTypeConfig.addTagGroup(tag.location().toString());
-                    });
+            Registry<DamageType> registry = event.getLevel().registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE);
+            registry.listElements().forEach(holder -> {
+                holder.tags().forEach(tag -> {
+                    DamageTypeConfig.addTagGroup(tag.location().toString());
                 });
-                DamageTypeConfig.addGroup(type.msgId());
-            }
+                DamageTypeConfig.addGroup(holder.value().msgId());
+            });
             DamageTypeConfig.register();
         }
 

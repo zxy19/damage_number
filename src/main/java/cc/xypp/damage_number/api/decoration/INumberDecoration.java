@@ -1,7 +1,7 @@
 package cc.xypp.damage_number.api.decoration;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 public interface INumberDecoration {
@@ -10,7 +10,7 @@ public interface INumberDecoration {
         T build(RegistryFriendlyByteBuf buf);
     }
 
-    @NotNull ResourceLocation getId();
+    @NotNull Identifier getId();
 
     void writeToNetwork(RegistryFriendlyByteBuf buf);
 }

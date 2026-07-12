@@ -8,16 +8,17 @@ import cc.xypp.damage_number.client.Data;
 import cc.xypp.damage_number.data.DamageRecord;
 import cc.xypp.damage_number.data.DamageTextFmt;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Items;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -28,7 +29,6 @@ import oshi.util.tuples.Pair;
 import java.util.Date;
 import java.util.List;
 
-@OnlyIn(Dist.CLIENT)
 public class ConfigScreen extends Screen {
     private static final int BUTTON_WIDTH = 200;
     private static final int BUTTON_HEIGHT = 20;
@@ -42,7 +42,7 @@ public class ConfigScreen extends Screen {
             DamageTextFmt.DEFAULT_TEXT_FMT,
             List.of(
                     new IconDecoration(
-                            ResourceLocation.fromNamespaceAndPath("minecraft", "textures/block/barrel_top.png"),
+                            Identifier.fromNamespaceAndPath("minecraft", "textures/block/barrel_top.png"),
                             0, 0,
                             16, 16,
                             16, 16
@@ -59,7 +59,7 @@ public class ConfigScreen extends Screen {
             DamageTextFmt.DEFAULT_TEXT_FMT,
             List.of(
                     new IconDecoration(
-                            ResourceLocation.fromNamespaceAndPath("minecraft", "textures/block/barrel_top.png"),
+                            Identifier.fromNamespaceAndPath("minecraft", "textures/block/barrel_top.png"),
                             0, 0,
                             16, 16,
                             16, 16
@@ -112,7 +112,7 @@ public class ConfigScreen extends Screen {
         scaleEditBox = this.addRenderableWidget(row.addChild(new EditBox(this.font, 0, 0, CONFIG_PANE_WIDTH, BUTTON_HEIGHT, Component.literal("scale"))));
         this.addRenderableWidget(row.addChild(new StringWidget(Component.literal(""), this.font)));
         selectKey = this.addRenderableWidget(row.addChild(
-                new CycleButton.Builder<Component>(this::changeKey)
+                CycleButton.<Component>builder(this::changeKey, () -> Component.literal("number"))
                         .withValues(
                                 Component.literal("number"),
                                 Component.literal("title"),
@@ -156,20 +156,19 @@ public class ConfigScreen extends Screen {
 
 
     @Override
-    public void render(@NotNull GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
-        this.renderBackground(guiGraphics, pMouseX, pMouseY, pPartialTick);
-        guiGraphics.drawString(this.font,
+    public void extractRenderState(@NotNull GuiGraphicsExtractor guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+        super.extractRenderState(guiGraphics, pMouseX, pMouseY, pPartialTick);
+        guiGraphics.text(this.font,
                 I18n.get("damage_number:config.title"),
                 this.width / 2 - this.font.width(I18n.get("damage_number:config.title")) / 2,
                 10,
                 0xFFFFFF);
-        super.render(guiGraphics, pMouseX, pMouseY, pPartialTick);
         render.render(guiGraphics, this.font, pPartialTick, this.width, this.height, true);
     }
 
     @Override
-    public void resize(Minecraft p_96575_, int p_96576_, int p_96577_) {
-        super.resize(p_96575_, p_96576_, p_96577_);
+    public void resize(int width, int height) {
+        super.resize(width, height);
         this.layout.arrangeElements();
     }
 
@@ -251,7 +250,9 @@ public class ConfigScreen extends Screen {
 
 
     @Override
-    public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
+    public boolean keyPressed(KeyEvent event) {
+        int pKeyCode = event.key();
+        int pModifiers = event.modifiers();
         int vd = 0, hd = 0;
         if (pKeyCode == GLFW.GLFW_KEY_UP) vd = 1;
         if (pKeyCode == GLFW.GLFW_KEY_DOWN) vd = -1;
@@ -299,6 +300,6 @@ public class ConfigScreen extends Screen {
                 return true;
             }
         }
-        return super.keyPressed(pKeyCode, pScanCode, pModifiers);
+        return super.keyPressed(event);
     }
 }

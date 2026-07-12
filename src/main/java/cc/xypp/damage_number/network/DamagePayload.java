@@ -7,12 +7,12 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 public record DamagePayload(String t, float amount, int combo,
                             DamageRecord data) implements CustomPacketPayload {
-    public static final CustomPacketPayload.Type<DamagePayload> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(DamageNumber.MODID, "damage"));
+    public static final CustomPacketPayload.Type<DamagePayload> TYPE = new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(DamageNumber.MODID, "damage"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, DamagePayload> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8,

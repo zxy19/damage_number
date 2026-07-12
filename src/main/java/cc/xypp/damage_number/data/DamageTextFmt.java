@@ -24,8 +24,8 @@ public class DamageTextFmt {
     public static DamageTextFmt fromNetwork(RegistryFriendlyByteBuf buf) {
         return new DamageTextFmt(
                 buf.readUtf(),
-                buf.readJsonWithCodec(ComponentSerialization.CODEC),
-                buf.readJsonWithCodec(ComponentSerialization.CODEC)
+                buf.readLenientJsonWithCodec(ComponentSerialization.CODEC),
+                buf.readLenientJsonWithCodec(ComponentSerialization.CODEC)
         );
     }
 

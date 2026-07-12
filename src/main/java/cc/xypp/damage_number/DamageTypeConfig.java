@@ -13,7 +13,7 @@ import com.electronwill.nightconfig.toml.TomlParser;
 import com.electronwill.nightconfig.toml.TomlWriter;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
@@ -28,9 +28,9 @@ import java.nio.file.Path;
 import java.util.*;
 
 
-@EventBusSubscriber(modid = DamageNumber.MODID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = DamageNumber.MODID)
 public class DamageTypeConfig {
-    record StyleRecord(String color, ResourceLocation itemStack, ResourceLocation icon, String prependKey,
+    record StyleRecord(String color, Identifier itemStack, Identifier icon, String prependKey,
                        String appendKey, String formatKey) {
     }
 
@@ -149,8 +149,8 @@ public class DamageTypeConfig {
 
         target.put(id, new StyleRecord(
                 color,
-                iconItem.isEmpty() ? null : ResourceLocation.tryParse(iconItem),
-                iconTex.isEmpty() ? null : ResourceLocation.tryParse(iconTex),
+                iconItem.isEmpty() ? null : Identifier.tryParse(iconItem),
+                iconTex.isEmpty() ? null : Identifier.tryParse(iconTex),
                 iconPrepend,
                 iconAppend,
                 iconFormat

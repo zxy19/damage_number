@@ -12,19 +12,19 @@ import cc.xypp.damage_number.data.DamageRecord;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.LayeredDraw;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 import oshi.util.tuples.Pair;
+import net.neoforged.neoforge.client.gui.GuiLayer;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public class DamageRender implements LayeredDraw.Layer {
+public class DamageRender implements GuiLayer {
     private long shakeDiff = 0;
     private long confirmTime = 0;
 
@@ -36,7 +36,7 @@ public class DamageRender implements LayeredDraw.Layer {
         }
     }
 
-    private static final Map<ResourceLocation, INumberDecorationRenderer<?>> renderers = Map.of(
+    private static final Map<Identifier, INumberDecorationRenderer<?>> renderers = Map.of(
             IconDecoration.ID, new IconDecorationRenderer(),
             ItemDecoration.ID, new ItemDecorationRenderer()
     );
@@ -44,16 +44,16 @@ public class DamageRender implements LayeredDraw.Layer {
 
     @SuppressWarnings("unchecked")
     private <T extends INumberDecoration> INumberDecorationRenderer<T> getDecorationRenderer(T decoration) {
-        ResourceLocation id = decoration.getId();
+        Identifier id = decoration.getId();
         return (INumberDecorationRenderer<T>) renderers.get(id);
     }
 
     @Override
-    public void render(@NotNull GuiGraphics pGuiGraphics, DeltaTracker pDeltaTracker) {
+    public void render(@NotNull GuiGraphicsExtractor pGuiGraphics, DeltaTracker pDeltaTracker) {
         this.render(pGuiGraphics, Minecraft.getInstance().font, pDeltaTracker.getGameTimeDeltaPartialTick(true), pGuiGraphics.guiWidth(), pGuiGraphics.guiHeight(), false);
     }
 
-    public void render(GuiGraphics guiGraphics, Font font, float partialTick, int screenWidth, int screenHeight, boolean alwaysShow) {
+    public void render(GuiGraphicsExtractor guiGraphics, Font font, float partialTick, int screenWidth, int screenHeight, boolean alwaysShow) {
         if (!Config.showDamage) return;
         Data.update();
         if (!Data.show && !alwaysShow) return;
@@ -105,32 +105,32 @@ public class DamageRender implements LayeredDraw.Layer {
         }//RANK OPT
         if (Config.titleShow) {//TITLE Render
             float scale = (float) Config.titleScale;
-            guiGraphics.pose().pushPose();
-            guiGraphics.pose().scale(scale, scale, scale);
+            guiGraphics.pose().pushMatrix();
+            guiGraphics.pose().scale(scale, scale);
             int x = valTransform(Config.titleX, screenWidth);
             int y = valTransform(Config.titleY, screenHeight);
             x = (int) (x / scale);
             y = (int) (y / scale);
 
 
-            guiGraphics.drawString(font, titleContent, x, y, ((int) titleColor) | ((int) (Config.titleOpacity * 255) << 24));
-            guiGraphics.pose().popPose();
+            guiGraphics.text(font, titleContent, x, y, ((int) titleColor) | ((int) (Config.titleOpacity * 255) << 24));
+            guiGraphics.pose().popMatrix();
         }//TITLE Render
         if (Config.comboShow) {//COMBO Render
             float scale = (float) Config.comboScale;
-            guiGraphics.pose().pushPose();
-            guiGraphics.pose().scale(scale, scale, scale);
+            guiGraphics.pose().pushMatrix();
+            guiGraphics.pose().scale(scale, scale);
             int x = valTransform(Config.comboX, screenWidth);
             int y = valTransform(Config.comboY, screenHeight);
             x = (int) (x / scale);
             y = (int) (y / scale);
-            guiGraphics.drawString(font, i18n("combo.content", String.valueOf(Data.combo)), x, y, ((int) comboColor) | ((int) (Config.comboOpacity * 255) << 24));
-            guiGraphics.pose().popPose();
+            guiGraphics.text(font, i18n("combo.content", String.valueOf(Data.combo)), x, y, ((int) comboColor) | ((int) (Config.comboOpacity * 255) << 24));
+            guiGraphics.pose().popMatrix();
         }//COMBO Render
         if (Config.damageListShow) {//List Render
             float scale = (float) Config.damageListScale;
-            guiGraphics.pose().pushPose();
-            guiGraphics.pose().scale(scale, scale, scale);
+            guiGraphics.pose().pushMatrix();
+            guiGraphics.pose().scale(scale, scale);
             int x = valTransform(Config.damageListX, screenWidth);
             int y = valTransform(Config.damageListY, screenHeight);
             int lh = font.lineHeight;
@@ -140,7 +140,7 @@ public class DamageRender implements LayeredDraw.Layer {
             for (Pair<Long, DamageRecord> recordTime : Data.latest) {
                 DamageRecord record = recordTime.getB();
                 Component component = record.displayFormat().getFinal(String.format("%.1f", record.amount()));
-                guiGraphics.drawString(font,
+                guiGraphics.text(font,
                         component,
                         x,
                         y,
@@ -151,12 +151,12 @@ public class DamageRender implements LayeredDraw.Layer {
                         y);
                 y += lh;
             }
-            guiGraphics.pose().popPose();
+            guiGraphics.pose().popMatrix();
         }//List Render
         if (Config.numberShow) {//Number Render
             float scale = (float) Config.numberScale;
-            guiGraphics.pose().pushPose();
-            guiGraphics.pose().scale(scale, scale, scale);
+            guiGraphics.pose().pushMatrix();
+            guiGraphics.pose().scale(scale, scale);
             int x = valTransform(Config.numberX, screenWidth);
             int y = valTransform(Config.numberY, screenHeight);
             x = (int) (x / scale);
@@ -185,28 +185,28 @@ public class DamageRender implements LayeredDraw.Layer {
                     y -= 1;
                 }
             }
-            guiGraphics.drawString(
+            guiGraphics.text(
                     font,
                     i18n("number.content", String.format("%.1f", Data.amount)),
                     x,
                     y,
                     (Data.confirm ? 0xf9a825 : (int) damageColor) | ((int) (Config.numberOpacity * 255) << 24));
-            guiGraphics.pose().popPose();
+            guiGraphics.pose().popMatrix();
         }//Number Render
     }
 
-    private void renderAllDecorations(List<INumberDecoration> decorations, GuiGraphics guiGraphics, int x, int y) {
+    private void renderAllDecorations(List<INumberDecoration> decorations, GuiGraphicsExtractor guiGraphics, int x, int y) {
         for (int i = 0; i < decorations.size(); i++) {
-            guiGraphics.pose().pushPose();
-            guiGraphics.pose().translate(x + i * 8, y, 0);
-            guiGraphics.pose().scale(0.5f, 0.5f, 1);
+            guiGraphics.pose().pushMatrix();
+            guiGraphics.pose().translate(x + i * 8, y);
+            guiGraphics.pose().scale(0.5f, 0.5f);
             INumberDecorationRenderer<INumberDecoration> decorationRenderer = getDecorationRenderer(decorations.get(i));
             decorationRenderer.render(guiGraphics, decorations.get(i), 1);
-            guiGraphics.pose().popPose();
+            guiGraphics.pose().popMatrix();
         }
     }
 
     private String i18n(String s, Object... args) {
-        return I18n.get(String.valueOf(ResourceLocation.fromNamespaceAndPath(DamageNumber.MODID, s)), args);
+        return I18n.get(String.valueOf(Identifier.fromNamespaceAndPath(DamageNumber.MODID, s)), args);
     }
 }
